@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.fittersfitter.app",
+        "sha256_cert_fingerprints": ["4A:EF:00:13:3D:E4:68:6D:E3:A8:AC:ED:31:36:EF:87:41:4F:44:0B:60:CA:84:4F:DB:45:B1:41:9C:2E:CF:26"]
+      }
+    }]
