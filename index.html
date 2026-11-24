@@ -1,0 +1,1938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f172a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fitters' Fitter">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<title>Fitters' Fitter</title>
+<style>
+  :root {
+    --bg: #080d18;
+    --header: #0d1424;
+    --card: #111a2e;
+    --card2: #18243e;
+    --card3: #203052;
+    --border: #2c3e63;
+    --border-hi: #47649c;
+    --text: #ffffff;
+    --muted: #a5b4fc;
+    --subtext: #94a3b8;
+    --amber: #f59e0b;
+    --amber-hi: #fbbf24;
+    --amber-bg: rgba(245, 158, 11, 0.18);
+    --amber-glow: rgba(245, 158, 11, 0.35);
+    --green: #10b981;
+    --green-hi: #34d399;
+    --green-bg: rgba(16, 185, 129, 0.16);
+    --cyan: #06b6d4;
+    --cyan-hi: #22d3ee;
+    --blue: #3b82f6;
+    --blue-hi: #60a5fa;
+    --orange: #f97316;
+    --red: #ef4444;
+    --mono: ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, monospace;
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: radial-gradient(circle at top center, #101b33 0%, var(--bg) 55%);
+    color: var(--text);
+    font-size: 16px;
+    line-height: 1.45;
+    padding-bottom: 54px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #err-banner {
+    display: none;
+    background: #7f1d1d;
+    color: #fecaca;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 700;
+    border-bottom: 2px solid var(--red);
+  }
+
+  header {
+    padding: 16px 16px 14px;
+    background: linear-gradient(180deg, #131e36 0%, #0b1120 100%);
+    border-bottom: 2px solid var(--border);
+    border-top: 4px solid var(--amber);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .brand-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--amber-hi) 0%, var(--orange) 100%);
+    color: #080d18;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 21px;
+    box-shadow: 0 3px 14px var(--amber-glow);
+    flex-shrink: 0;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.2px;
+    color: #ffffff;
+  }
+  header p {
+    margin: 3px 0 0;
+    font-size: 11.5px;
+    font-family: var(--mono);
+    color: var(--cyan-hi);
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+
+  .tab-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 7px;
+    padding: 10px 12px;
+    background: rgba(11, 17, 32, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 2px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+  }
+  .tab-btn {
+    background: linear-gradient(180deg, var(--card2) 0%, var(--card) 100%);
+    border: 1px solid var(--border);
+    border-bottom: 2px solid #060911;
+    color: #cbd5e1;
+    font-weight: 800;
+    font-size: 13.5px;
+    padding: 12px 4px;
+    border-radius: 9px;
+    cursor: pointer;
+    text-align: center;
+    touch-action: manipulation;
+    transition: all 0.12s ease;
+  }
+  .tab-btn:active {
+    transform: scale(0.96);
+  }
+  .tab-btn.active {
+    background: linear-gradient(180deg, var(--amber-hi) 0%, var(--orange) 100%);
+    color: #080d18;
+    border-color: var(--amber-hi);
+    border-bottom: 2px solid #b45309;
+    font-weight: 900;
+    box-shadow: 0 3px 12px var(--amber-glow);
+  }
+
+  .wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 16px 12px;
+  }
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeIn 0.14s ease-out; }
+  @keyframes fadeIn {
+    from { opacity: 0.65; transform: translateY(2px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--amber);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.38);
+  }
+  #tab-pipe .card, #tab-offset .card { border-top-color: var(--cyan); }
+  #tab-takeoffs .card, #tab-blank .card { border-top-color: var(--green); }
+  #tab-valves .card, #tab-calc .card { border-top-color: var(--blue-hi); }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--amber-hi);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin: 0 0 13px;
+    padding-bottom: 9px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  #tab-pipe .card-title, #tab-offset .card-title { color: var(--cyan-hi); }
+  #tab-takeoffs .card-title, #tab-blank .card-title { color: var(--green-hi); }
+  #tab-valves .card-title, #tab-calc .card-title { color: var(--blue-hi); }
+
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .pill {
+    background: linear-gradient(180deg, var(--card3) 0%, var(--card2) 100%);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: all 0.12s ease;
+  }
+  .pill:hover { border-color: var(--border-hi); }
+  .pill:active { transform: scale(0.96); }
+  .pill.active {
+    background: linear-gradient(180deg, var(--amber-hi) 0%, var(--amber) 100%);
+    color: #080d18;
+    border-color: var(--amber-hi);
+    font-weight: 900;
+    box-shadow: 0 3px 10px var(--amber-glow);
+  }
+  #tab-takeoffs .pill.active {
+    background: linear-gradient(180deg, var(--green-hi) 0%, var(--green) 100%);
+    border-color: var(--green-hi);
+    box-shadow: 0 3px 10px rgba(16, 185, 129, 0.35);
+  }
+  #tab-valves .pill.active {
+    background: linear-gradient(180deg, var(--blue-hi) 0%, var(--blue) 100%);
+    border-color: var(--blue-hi);
+    box-shadow: 0 3px 10px rgba(59, 130, 246, 0.38);
+  }
+
+  .nps-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 7px;
+    margin-bottom: 14px;
+  }
+  .nps-btn {
+    background: linear-gradient(180deg, var(--card3) 0%, var(--card2) 100%);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 2px;
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: center;
+    touch-action: manipulation;
+    transition: all 0.1s ease;
+  }
+  .nps-btn:active:not(:disabled) { transform: scale(0.95); }
+  .nps-btn.active {
+    background: linear-gradient(180deg, var(--amber-hi) 0%, var(--amber) 100%);
+    color: #080d18;
+    border-color: var(--amber-hi);
+    font-weight: 900;
+    box-shadow: 0 3px 10px var(--amber-glow);
+  }
+  #tab-valves .nps-btn.active {
+    background: linear-gradient(180deg, var(--blue-hi) 0%, var(--blue) 100%);
+    border-color: var(--blue-hi);
+    box-shadow: 0 3px 10px rgba(59, 130, 246, 0.38);
+  }
+  .nps-btn:disabled {
+    opacity: 0.22;
+    cursor: not-allowed;
+  }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  @media (min-width: 560px) {
+    .metrics { grid-template-columns: repeat(3, 1fr); }
+  }
+  .mbox {
+    background: linear-gradient(180deg, var(--card2) 0%, #131e36 100%);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--amber);
+    border-radius: 10px;
+    padding: 12px 13px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  #tab-valves .mbox { border-left-color: var(--blue-hi); }
+  .mlbl {
+    font-size: 11.5px;
+    font-weight: 800;
+    color: var(--subtext);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .mval {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 20px;
+    font-weight: 900;
+    color: #ffffff;
+    margin-top: 4px;
+  }
+  .msub {
+    font-size: 12px;
+    color: var(--amber-hi);
+    margin-top: 3px;
+    font-weight: 600;
+  }
+  #tab-valves .msub { color: var(--cyan-hi); }
+
+  .badge {
+    background: rgba(245, 158, 11, 0.18);
+    color: var(--amber-hi);
+    border: 1px solid rgba(245, 158, 11, 0.48);
+    padding: 4px 10px;
+    border-radius: 7px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  #tab-valves .badge {
+    background: rgba(59, 130, 246, 0.18);
+    color: var(--blue-hi);
+    border-color: rgba(59, 130, 246, 0.48);
+  }
+  #tab-blank .badge {
+    background: rgba(16, 185, 129, 0.18);
+    color: var(--green-hi);
+    border-color: rgba(16, 185, 129, 0.48);
+  }
+
+  .field { margin-bottom: 13px; }
+  .field label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 800;
+    color: #cbd5e1;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 6px;
+  }
+  input, select {
+    width: 100%;
+    height: 54px;
+    background: #0a101d;
+    border: 1.5px solid var(--border);
+    color: #ffffff;
+    border-radius: 10px;
+    padding: 0 14px;
+    font-family: var(--mono);
+    font-size: 17px;
+    font-weight: 800;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  select {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 15.5px;
+    font-weight: 700;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--amber-hi);
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.22);
+  }
+
+  .row-mic { display: flex; gap: 9px; }
+  .mic-btn {
+    width: 58px;
+    height: 54px;
+    flex-shrink: 0;
+    background: linear-gradient(180deg, var(--card3) 0%, var(--card2) 100%);
+    border: 1.5px solid var(--border);
+    color: var(--amber-hi);
+    border-radius: 10px;
+    font-size: 22px;
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+  .mic-btn:active { transform: scale(0.95); }
+  .mic-btn.listening {
+    background: var(--red);
+    color: #fff;
+    border-color: var(--red);
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.55);
+  }
+
+  .result-box {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(6, 182, 212, 0.1) 100%);
+    border: 1.5px solid rgba(52, 211, 153, 0.55);
+    border-left: 5px solid var(--green-hi);
+    border-radius: 12px;
+    padding: 15px 16px;
+    margin-top: 14px;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.15);
+  }
+  .result-main {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--green-hi);
+    letter-spacing: -0.3px;
+  }
+  .result-sub {
+    font-size: 13.5px;
+    color: #f1f5f9;
+    margin-top: 6px;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  .tbl-wrap {
+    overflow-x: auto;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: #0a101d;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 13.5px;
+    white-space: nowrap;
+  }
+  th {
+    background: #070b14;
+    color: var(--amber-hi);
+    text-align: left;
+    padding: 11px 12px;
+    border-bottom: 1.5px solid var(--border);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 800;
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(44, 62, 99, 0.55);
+    color: #f1f5f9;
+  }
+  tbody tr:nth-child(even) td {
+    background: rgba(24, 36, 62, 0.42);
+  }
+  tr.hl td {
+    background: rgba(245, 158, 11, 0.24) !important;
+    color: #ffffff;
+    font-weight: 900;
+    border-top: 1.5px solid rgba(251, 191, 36, 0.55);
+    border-bottom: 1.5px solid rgba(251, 191, 36, 0.55);
+  }
+  td:first-child, th:first-child {
+    position: sticky;
+    left: 0;
+    background: var(--card);
+    z-index: 2;
+    font-weight: 900;
+    border-right: 1.5px solid var(--border);
+  }
+  th:first-child {
+    background: #070b14;
+    z-index: 3;
+  }
+
+  .btn-act {
+    background: linear-gradient(180deg, var(--blue-hi) 0%, var(--blue) 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
+    transition: transform 0.1s ease;
+  }
+  .btn-act:active { transform: scale(0.97); }
+  .btn-sec {
+    background: linear-gradient(180deg, var(--card3) 0%, var(--card2) 100%);
+    color: var(--text);
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    padding: 9px 13px;
+    font-size: 13.5px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.1s ease;
+  }
+  .btn-sec:active { transform: scale(0.96); border-color: var(--amber-hi); }
+
+  .calc-disp {
+    background: #050811;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    text-align: right;
+    margin-bottom: 12px;
+    box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.7);
+  }
+  .calc-expr {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--subtext);
+    min-height: 20px;
+  }
+  .calc-main {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--amber-hi);
+    letter-spacing: -0.5px;
+  }
+  .calc-alt {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--cyan-hi);
+    font-weight: 700;
+    margin-top: 4px;
+  }
+  .frac-bar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .keypad {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .kbtn {
+    height: 54px;
+    background: linear-gradient(180deg, var(--card3) 0%, var(--card2) 100%);
+    border: 1.5px solid var(--border);
+    border-bottom: 3px solid #060a14;
+    color: #ffffff;
+    border-radius: 10px;
+    font-family: var(--mono);
+    font-size: 17px;
+    font-weight: 800;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: transform 0.08s ease, background 0.1s ease;
+  }
+  .kbtn:active { transform: scale(0.95); background: var(--card); }
+  .kbtn.op {
+    color: var(--cyan-hi);
+    background: linear-gradient(180deg, #1e3252 0%, #15233b 100%);
+    border-color: #365280;
+  }
+  .kbtn.eq {
+    background: linear-gradient(180deg, var(--amber-hi) 0%, var(--orange) 100%);
+    color: #080d18;
+    border-color: var(--amber-hi);
+    border-bottom: 3px solid #9a3412;
+    font-weight: 900;
+  }
+  .tape {
+    max-height: 130px;
+    overflow-y: auto;
+    background: #050811;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 13px;
+    margin-top: 12px;
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: #cbd5e1;
+  }
+  .tape div {
+    padding: 4px 0;
+    border-bottom: 1px dashed #243454;
+  }
+  .note {
+    font-size: 12.5px;
+    color: var(--subtext);
+    margin-top: 6px;
+  }
+</style>
+</head>
+<body>
+
+<div id="err-banner"></div>
+
+<header>
+  <div class="brand-wrap">
+    <div class="brand-icon">&#9881;</div>
+    <div>
+      <h1>Fitters' Fitter</h1>
+      <p>ASME B16.5 • B36.10M/19M • B16.9/11/3 • B1.20.1 • B16.10 • B31.3 • PCC-1</p>
+    </div>
+  </div>
+</header>
+
+<nav class="tab-grid" id="tab-bar">
+  <button type="button" class="tab-btn active" data-tab="flanges" onclick="openTab('flanges')">Flanges</button>
+  <button type="button" class="tab-btn" data-tab="pipe" onclick="openTab('pipe')">Pipe &amp; Sch</button>
+  <button type="button" class="tab-btn" data-tab="takeoffs" onclick="openTab('takeoffs')">Takeoffs</button>
+  <button type="button" class="tab-btn" data-tab="offset" onclick="openTab('offset')">Offset</button>
+  <button type="button" class="tab-btn" data-tab="valves" onclick="openTab('valves')">Valves</button>
+  <button type="button" class="tab-btn" data-tab="calc" onclick="openTab('calc')">Calc</button>
+  <button type="button" class="tab-btn" data-tab="blank" onclick="openTab('blank')">Hydro Blank</button>
+  <button type="button" class="tab-btn" data-tab="torque" onclick="openTab('torque')">Torque</button>
+</nav>
+
+<div class="wrap">
+  <!-- 1. FLANGES -->
+  <section id="tab-flanges" class="panel active">
+    <div class="card">
+      <div class="card-title"><span>ASME B16.5 Pressure Class</span><span id="flg-badge" class="badge"></span></div>
+      <div id="flg-classes" class="pills"></div>
+      <div id="flg-nps-grid" class="nps-grid"></div>
+      <div id="flg-metrics" class="metrics"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Full Class Reference Table</div>
+      <div class="tbl-wrap"><table id="flg-table"></table></div>
+    </div>
+  </section>
+
+  <!-- 2. PIPE & SCHEDULES -->
+  <section id="tab-pipe" class="panel">
+    <div class="card">
+      <div class="card-title">Spool Rigging Weight Calculator</div>
+      <div class="field"><label for="rg-nps">Nominal Pipe Size</label><select id="rg-nps"></select></div>
+      <div class="field"><label for="rg-sch">Schedule</label><select id="rg-sch"></select></div>
+      <div class="field"><label for="rg-len">Total Pipe Length (Feet or Ft-In)</label><input id="rg-len" type="text" value="20'"></div>
+      <div class="field"><label for="rg-water">Include Water Weight (Hydrotest)?</label>
+        <select id="rg-water"><option value="0">Dry Pipe Only</option><option value="1">Water-Filled (Hydrotest)</option></select>
+      </div>
+      <div id="rg-res" class="result-box"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">ASME B36.10M / B36.19M Schedules</div>
+      <div class="tbl-wrap"><table id="pipe-table"></table></div>
+    </div>
+  </section>
+
+  <!-- 3. FITTING TAKEOFFS -->
+  <section id="tab-takeoffs" class="panel">
+    <div class="card">
+      <div class="card-title">Piping System</div>
+      <div id="tk-systems" class="pills"></div>
+      <div class="card-title" style="margin-top:12px;">Quick Cut-Pipe Length Helper</div>
+      <div class="field">
+        <label for="cut-cc">Center-to-Center (C-C) Dimension</label>
+        <div class="row-mic">
+          <input id="cut-cc" type="text" value="4' 6&quot;">
+          <button type="button" id="mic-btn" class="mic-btn" title="Voice Input">&#127908;</button>
+        </div>
+        <div id="mic-status" class="note">Tap mic (or keyboard mic) and say e.g. fourteen feet eleven and five sixteenths</div>
+      </div>
+      <div class="field"><label for="cut-nps">Nominal Pipe Size</label><select id="cut-nps"></select></div>
+      <div class="field"><label for="cut-a">End A Fitting</label><select id="cut-a"></select></div>
+      <div class="field"><label for="cut-b">End B Fitting</label><select id="cut-b"></select></div>
+      <div class="field">
+        <label for="takeoff-gap">Weld / Expansion Gap (Per Joint)</label>
+        <select id="takeoff-gap">
+          <option value="0">0" (Threaded NPT / Socket / PVC / Copper)</option>
+          <option value="0.0625">1/16"</option>
+          <option value="0.09375">3/32"</option>
+          <option value="0.125" selected>1/8"</option>
+          <option value="0.15625">5/32"</option>
+          <option value="0.1875">3/16"</option>
+          <option value="0.25">1/4"</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="cut-valve">In-Line Valve / Assembly Deduction</label>
+        <div style="display:flex;gap:8px;">
+          <input id="cut-valve" type="text" value="0">
+          <button type="button" id="clear-valve" class="btn-sec" style="width:100px;">Clear</button>
+        </div>
+        <div id="valve-note" class="note">No in-line valve deducted</div>
+      </div>
+      <div id="cut-res" class="result-box"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span id="tk-tbl-title">Takeoff Chart</span></div>
+      <div class="tbl-wrap"><table id="tk-table"></table></div>
+    </div>
+  </section>
+
+  <!-- 4. ROLLING OFFSET -->
+  <section id="tab-offset" class="panel">
+    <div class="card">
+      <div class="card-title">Rolling Offset Calculator</div>
+      <svg id="off-svg" viewBox="0 0 320 155" style="width:100%;max-height:185px;background:#050811;border:1.5px solid var(--border);border-radius:10px;margin-bottom:13px;"></svg>
+      <div class="field"><label for="off-rise">Rise (Vertical Offset)</label><input id="off-rise" type="text" value="12&quot;"></div>
+      <div class="field"><label for="off-roll">Roll (Horizontal Offset)</label><input id="off-roll" type="text" value="16&quot;"></div>
+      <div class="field"><label for="off-ang">Fitting Angle</label>
+        <select id="off-ang">
+          <option value="45" selected>45° Elbow</option>
+          <option value="22.5">22.5° Elbow</option>
+          <option value="60">60° Elbow</option>
+          <option value="30">30° Elbow</option>
+        </select>
+      </div>
+      <div class="field"><label for="off-nps">Nominal Pipe Size (Optional Takeoff Deduction)</label><select id="off-nps"></select></div>
+      <div id="off-res" class="result-box"></div>
+    </div>
+  </section>
+
+  <!-- 5. VALVES -->
+  <section id="tab-valves" class="panel">
+    <div class="card">
+      <div class="card-title"><span>End Connection &amp; Class</span><span id="vlv-std" class="badge">ASME B16.10</span></div>
+      <div id="vlv-ends" class="pills">
+        <button type="button" class="pill active" data-end="RF">Raised Face (RF)</button>
+        <button type="button" class="pill" data-end="RTJ">Ring Joint (RTJ)</button>
+        <button type="button" class="pill" data-end="BW">Butt Weld (BW)</button>
+        <button type="button" class="pill" data-end="SW">Socket Weld (SW)</button>
+      </div>
+      <div id="vlv-classes" class="pills"></div>
+      <div id="vlv-nps-grid" class="nps-grid"></div>
+      <div id="vlv-metrics" class="metrics"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Valve Dimensions Table</div>
+      <div class="tbl-wrap"><table id="vlv-table"></table></div>
+    </div>
+  </section>
+
+  <!-- 6. CONSTRUCTION CALC -->
+  <section id="tab-calc" class="panel">
+    <div class="card">
+      <div class="card-title"><span>Feet-Inch-Fraction Calculator</span><button type="button" id="send-cc-btn" class="btn-sec">&#8594; Send to C-C</button></div>
+      <div class="field" style="margin-bottom:10px;">
+        <div class="row-mic">
+          <input id="calc-voice-in" type="text" placeholder="Dictate e.g. 4' 6&quot; + 2' 3-1/2&quot;" style="height:48px;font-size:15px;">
+          <button type="button" id="calc-mic-btn" class="mic-btn" style="height:48px;" title="Voice Math Input">&#127908;</button>
+          <button type="button" id="calc-voice-go" class="btn-sec" style="width:64px;height:48px;">=</button>
+        </div>
+        <div id="calc-mic-status" class="note">Tap mic (or keyboard mic) &amp; say e.g. four feet six plus two feet three and a half</div>
+      </div>
+      <div class="calc-disp">
+        <div id="c-expr" class="calc-expr"></div>
+        <div id="c-main" class="calc-main">0"</div>
+        <div id="c-alt" class="calc-alt">0"</div>
+      </div>
+      <div class="frac-bar" id="frac-keys"></div>
+      <div class="keypad" id="calc-keys"></div>
+      <div id="calc-tape" class="tape"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Pipe Wrap-Around Solver</div>
+      <div class="field"><label for="wr-nps">Pipe Size</label><select id="wr-nps"></select></div>
+      <div id="wr-res" class="result-box"></div>
+    </div>
+  </section>
+
+  <!-- 7. HYDROTEST BLANK THICKNESS -->
+  <section id="tab-blank" class="panel">
+    <div class="card">
+      <div class="card-title"><span>Hydrotest Blank Thickness</span><span class="badge">ASME B31.3 §304.5.3</span></div>
+      <div class="field"><label for="hb-nps">Nominal Pipe Size</label><select id="hb-nps"></select></div>
+      <div class="field"><label for="hb-psi">Hydrotest Pressure (psig)</label><input id="hb-psi" type="number" step="5" value="275" min="1"></div>
+      <div class="field"><label for="hb-stress">Blank Material Allowable Stress S (psi)</label>
+        <select id="hb-stress">
+          <option value="20000" selected>CS A105 / A516-70 / A36 (20,000 psi)</option>
+          <option value="17100">CS A106-B / A516-70 @ 500°F (17,100 psi)</option>
+          <option value="15000">Low-Strength / Conservative (15,000 psi)</option>
+        </select>
+      </div>
+      <div class="field"><label for="hb-corr">Corrosion Allowance c</label>
+        <select id="hb-corr">
+          <option value="0" selected>0" (Clean Hydrotest)</option>
+          <option value="0.0625">1/16"</option>
+          <option value="0.125">1/8"</option>
+        </select>
+      </div>
+      <div id="hb-res" class="result-box"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Quick Pressure Blank Reference (Current NPS)</div>
+      <div class="tbl-wrap"><table id="hb-table"></table></div>
+    </div>
+  </section>
+
+  <!-- 8. FLANGE BOLT TORQUE CHART -->
+  <section id="tab-torque" class="panel">
+    <div class="card">
+      <div class="card-title"><span>Flange Stud Torque Chart</span><span class="badge">ASME B16.5 / PCC-1</span></div>
+      <div id="tq-classes" class="pills"></div>
+      <div id="tq-nps-grid" class="nps-grid"></div>
+      <div class="field"><label for="tq-k">Thread Lubrication / Nut Factor (K)</label>
+        <select id="tq-k">
+          <option value="0.15" selected>Moly / Anti-Seize Lubricated (K = 0.15)</option>
+          <option value="0.20">General Lubricated / Oiled Studs (K = 0.20)</option>
+          <option value="0.10">PTFE / Low-Friction Coated (K = 0.10)</option>
+          <option value="0.30">Dry / Unlubricated Threads (K = 0.30)</option>
+        </select>
+      </div>
+      <div id="tq-metrics" class="metrics"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span id="tq-tbl-title">Class Torque Table</span></div>
+      <div class="tbl-wrap"><table id="tq-table"></table></div>
+    </div>
+  </section>
+</div>
+
+<script>
+window.onerror = function(msg, src, line) {
+  var b = document.getElementById('err-banner');
+  if (b) {
+    b.style.display = 'block';
+    b.textContent = 'Error (Line ' + line + '): ' + msg;
+  }
+};
+
+function $(id) { return document.getElementById(id); }
+
+function openTab(name) {
+  if (!name) return;
+  var btns = document.querySelectorAll('.tab-btn');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.toggle('active', btns[i].getAttribute('data-tab') === name);
+  }
+  var panels = document.querySelectorAll('.panel');
+  for (var j = 0; j < panels.length; j++) {
+    panels[j].classList.toggle('active', panels[j].id === 'tab-' + name);
+  }
+}
+
+var INCH = String.fromCharCode(34);
+var FOOT = String.fromCharCode(39);
+
+function normKey(v) { return String(v == null ? '' : v).replace(/["'\s]/g, '').trim(); }
+function withIn(v) {
+  if (v == null || v === '' || v === '—') return '—';
+  var s = String(v).replace(/"+$/g, '').trim();
+  return s ? s + INCH : '0' + INCH;
+}
+function fmtFIF(val) {
+  if (val == null || typeof val !== 'number' || isNaN(val)) return '—';
+  var neg = val < 0 ? '-' : '';
+  var tot16 = Math.round(Math.abs(val) * 16);
+  var ft = Math.floor(tot16 / 192);
+  tot16 %= 192;
+  var inch = Math.floor(tot16 / 16);
+  var rem = tot16 % 16;
+  var frac = '';
+  if (rem > 0) {
+    var n = rem, d = 16;
+    while (n % 2 === 0) { n /= 2; d /= 2; }
+    frac = (inch > 0 ? '-' : '') + n + '/' + d;
+  }
+  var inPart = (inch > 0 || frac) ? (inch || '') + frac + INCH : (ft === 0 ? '0' + INCH : '');
+  return neg + (ft > 0 ? (ft + FOOT + ' ' + inPart).trim() : inPart);
+}
+function normalizeSpokenDim(txt) {
+  if (!txt) return '';
+  var s = String(txt).toLowerCase().replace(/,/g, ' ').replace(/and/g, ' ');
+  var tens = {twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
+  var ones = {
+    zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,
+    ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,
+    sixteen:16,seventeen:17,eighteen:18,nineteen:19
+  };
+  s = s.replace(/(twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)[\s-]+(one|two|three|four|five|six|seven|eight|nine)/g, function(_, t, o) {
+    return String(tens[t] + ones[o]);
+  });
+  Object.keys(tens).forEach(function(w) {
+    s = s.replace(new RegExp('\b' + w + '\b', 'g'), String(tens[w]));
+  });
+  Object.keys(ones).forEach(function(w) {
+    s = s.replace(new RegExp('\b' + w + '\b', 'g'), String(ones[w]));
+  });
+  s = s.replace(/(a\s+)?half/g, '1/2')
+       .replace(/(a\s+|one\s+)?quarter/g, '1/4')
+       .replace(/three\s+quarters?/g, '3/4')
+       .replace(/(\d+)\s+halves/g, '$1/2')
+       .replace(/(\d+)\s+(fourth|fourths|quarter|quarters)/g, '$1/4')
+       .replace(/(\d+)\s+(eighth|eighths)/g, '$1/8')
+       .replace(/(\d+)\s+(sixteenth|sixteenths)/g, '$1/16')
+       .replace(/(\d+)\s+(thirty[\s-]?second|thirty[\s-]?seconds|32nd|32nds)/g, '$1/32')
+       .replace(/(eighth|eighths)/g, '1/8')
+       .replace(/(sixteenth|sixteenths)/g, '1/16')
+       .replace(/(thirty[\s-]?second|thirty[\s-]?seconds)/g, '1/32')
+       .replace(/\s+\//g, '/');
+  return s.replace(/\s+/g, ' ').trim();
+}
+
+function parseDim(str) {
+  if (typeof str === 'number') return str;
+  if (!str) return 0;
+  var s = normalizeSpokenDim(str).replace(/feet|foot|ft/gi, FOOT).replace(/inches|inch|in/gi, INCH);
+  var ft = 0, inch = 0;
+  if (s.indexOf(FOOT) > -1) {
+    var p = s.split(FOOT);
+    ft = parseFloat(p[0]) || 0;
+    s = p[1] || '';
+  }
+  s = s.replace(/"/g, '').replace(/-/g, ' ').trim();
+  if (s) {
+    s.split(/\s+/).forEach(function(tok) {
+      if (tok.indexOf('/') > -1) {
+        var ab = tok.split('/');
+        var b = parseFloat(ab[1]) || 1;
+        if (b) inch += (parseFloat(ab[0]) || 0) / b;
+      } else {
+        inch += parseFloat(tok) || 0;
+      }
+    });
+  }
+  return ft * 12 + inch;
+}
+
+function attachVoiceButton(btnId, inputId, statusId, onParsed) {
+  var btn = $(btnId), inp = $(inputId), st = $(statusId);
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SR) {
+    var rec = new SR();
+    rec.lang = 'en-US';
+    btn.onclick = function() {
+      btn.classList.add('listening');
+      st.textContent = 'Listening...';
+      try {
+        rec.start();
+      } catch (err) {
+        btn.classList.remove('listening');
+        inp.focus();
+        inp.select();
+        st.textContent = 'Browser mic blocked here — tap the mic icon on your Gboard keyboard instead.';
+      }
+    };
+    rec.onresult = function(e) {
+      var txt = e.results[0][0].transcript;
+      st.textContent = 'Heard: "' + txt + '"';
+      onParsed(txt);
+    };
+    rec.onerror = function() {
+      btn.classList.remove('listening');
+      inp.focus();
+      inp.select();
+      st.textContent = 'Browser mic unavailable offline/outside Chrome — tap the mic icon on your Gboard keyboard instead.';
+    };
+    rec.onend = function() { btn.classList.remove('listening'); };
+  } else {
+    btn.onclick = function() {
+      inp.focus();
+      inp.select();
+      st.textContent = 'Outside Chrome: tap the microphone key on your Gboard keyboard to dictate.';
+    };
+  }
+}
+
+var NPS_LIST = [
+  {nps:'1/2',od:0.84},{nps:'3/4',od:1.05},{nps:'1',od:1.315},{nps:'1-1/4',od:1.66},{nps:'1-1/2',od:1.9},
+  {nps:'2',od:2.375},{nps:'2-1/2',od:2.875},{nps:'3',od:3.5},{nps:'4',od:4.5},{nps:'5',od:5.563},
+  {nps:'6',od:6.625},{nps:'8',od:8.625},{nps:'10',od:10.75},{nps:'12',od:12.75},{nps:'14',od:14},
+  {nps:'16',od:16},{nps:'18',od:18},{nps:'20',od:20},{nps:'24',od:24}
+];
+
+function getOd(nps) {
+  var k = normKey(nps);
+  for (var i = 0; i < NPS_LIST.length; i++) {
+    if (normKey(NPS_LIST[i].nps) === k) return NPS_LIST[i].od;
+  }
+  return 4.5;
+}
+</script>
+
+<script>
+var HEX_WRENCH = {
+  '1/2':'7/8','5/8':'1-1/16','3/4':'1-1/4','7/8':'1-7/16','1':'1-5/8','1-1/8':'1-13/16',
+  '1-1/4':'2','1-3/8':'2-3/16','1-1/2':'2-3/8','1-5/8':'2-9/16','1-3/4':'2-3/4',
+  '1-7/8':'2-15/16','2':'3-1/8','2-1/4':'3-1/2','2-1/2':'3-7/8','2-3/4':'4-1/4','3':'4-5/8'
+};
+
+var FLANGES_RAW = {
+  '150': [
+    ['1/2',3.5,0.44,2.38,4,'1/2',0.62,2.25,null,'R11',1.88,1.88],
+    ['3/4',3.88,0.5,2.75,4,'1/2',0.62,2.5,null,'R13',2.25,2.06],
+    ['1',4.25,0.56,3.12,4,'1/2',0.62,2.5,3,'R15',2.62,2.19],
+    ['1-1/4',4.62,0.62,3.5,4,'1/2',0.62,2.75,3.25,'R17',3,2.25],
+    ['1-1/2',5,0.69,3.88,4,'1/2',0.62,2.75,3.25,'R19',3.38,2.44],
+    ['2',6,0.75,4.75,4,'5/8',0.75,3.25,3.75,'R22',4.12,2.5],
+    ['2-1/2',7,0.88,5.5,4,'5/8',0.75,3.5,4,'R25',4.88,2.75],
+    ['3',7.5,0.94,6,4,'5/8',0.75,3.5,4,'R29',5.38,2.75],
+    ['4',9,0.94,7.5,8,'5/8',0.75,3.5,4,'R36',6.88,3],
+    ['5',10,0.94,8.5,8,'3/4',0.88,3.75,4.25,'R40',7.75,3.5],
+    ['6',11,1,9.5,8,'3/4',0.88,4,4.5,'R43',8.75,3.5],
+    ['8',13.5,1.12,11.75,8,'3/4',0.88,4.25,4.75,'R48',11,4],
+    ['10',16,1.19,14.25,12,'7/8',1,4.5,5,'R52',13.38,4],
+    ['12',19,1.25,17,12,'7/8',1,4.75,5.25,'R56',16.12,4.5],
+    ['14',21,1.38,18.75,12,'1',1.12,5.25,5.75,'R59',17.75,5],
+    ['16',23.5,1.44,21.25,16,'1',1.12,5.25,5.75,'R64',20.25,5],
+    ['18',25,1.56,22.75,16,'1-1/8',1.25,5.75,6.25,'R68',21.62,5.5],
+    ['20',27.5,1.69,25,20,'1-1/8',1.25,6.25,6.75,'R72',23.88,5.69],
+    ['24',32,1.88,29.5,20,'1-1/4',1.38,6.75,7.25,'R76',28.25,6]
+  ],
+  '300': [
+    ['1/2',3.75,0.56,2.62,4,'1/2',0.62,2.5,3,'R11',2.12,2.06],
+    ['3/4',4.62,0.62,3.25,4,'5/8',0.75,3,3.5,'R13',2.62,2.25],
+    ['1',4.88,0.69,3.5,4,'5/8',0.75,3,3.5,'R16',2.88,2.44],
+    ['1-1/4',5.25,0.75,3.88,4,'5/8',0.75,3.25,3.75,'R18',3.25,2.56],
+    ['1-1/2',6.12,0.81,4.5,4,'3/4',0.88,3.5,4,'R20',3.75,2.69],
+    ['2',6.5,0.88,5,8,'5/8',0.75,3.5,4,'R23',4.38,2.75],
+    ['2-1/2',7.5,1,5.88,8,'3/4',0.88,4,4.5,'R26',5.12,3],
+    ['3',8.25,1.12,6.62,8,'3/4',0.88,4.25,4.75,'R31',5.88,3.12],
+    ['4',10,1.25,7.88,8,'3/4',0.88,4.5,5,'R37',7.12,3.38],
+    ['5',11,1.38,9.25,8,'3/4',0.88,4.75,5.25,'R41',8.5,3.88],
+    ['6',12.5,1.44,10.62,12,'3/4',0.88,4.75,5.5,'R45',9.88,3.88],
+    ['8',15,1.62,13,12,'7/8',1,5.5,6,'R49',12.12,4.38],
+    ['10',17.5,1.88,15.25,16,'1',1.12,6.25,6.75,'R53',14.25,4.62],
+    ['12',20.5,2,17.75,16,'1-1/8',1.25,6.75,7.25,'R57',16.62,5.12],
+    ['14',23,2.12,20.25,20,'1-1/8',1.25,7,7.5,'R61',19.12,5.62],
+    ['16',25.5,2.25,22.5,20,'1-1/4',1.38,7.5,8,'R65',21.25,5.75],
+    ['18',28,2.38,24.75,24,'1-1/4',1.38,7.75,8.25,'R69',23.5,6.25],
+    ['20',30.5,2.5,27,24,'1-1/4',1.38,8,8.75,'R73',25.75,6.38],
+    ['24',36,2.75,32,24,'1-1/2',1.62,9,9.75,'R77',30.5,6.62]
+  ],
+  '600': [
+    ['1/2',3.75,0.56,2.62,4,'1/2',0.62,3,3,'R11',2.12,2.06],
+    ['3/4',4.62,0.62,3.25,4,'5/8',0.75,3.5,3.5,'R13',2.62,2.25],
+    ['1',4.88,0.69,3.5,4,'5/8',0.75,3.5,3.5,'R16',2.88,2.44],
+    ['1-1/4',5.25,0.81,3.88,4,'5/8',0.75,3.75,3.75,'R18',3.25,2.62],
+    ['1-1/2',6.12,0.88,4.5,4,'3/4',0.88,4.25,4.25,'R20',3.75,2.75],
+    ['2',6.5,1,5,8,'5/8',0.75,4.25,4.25,'R23',4.38,2.88],
+    ['2-1/2',7.5,1.12,5.88,8,'3/4',0.88,4.75,4.75,'R26',5.12,3.12],
+    ['3',8.25,1.25,6.62,8,'3/4',0.88,5,5,'R31',5.88,3.25],
+    ['4',10.75,1.5,8.5,8,'7/8',1,5.75,5.75,'R37',7.62,4],
+    ['5',13,1.75,10.5,8,'1',1.12,6.5,6.5,'R41',9.5,4.5],
+    ['6',14,1.88,11.5,12,'1',1.12,6.75,6.75,'R45',10.5,4.62],
+    ['8',16.5,2.19,13.75,12,'1-1/8',1.25,7.5,7.75,'R49',12.62,5.25],
+    ['10',20,2.5,17,16,'1-1/4',1.38,8.5,8.5,'R53',15.75,6],
+    ['12',22,2.62,19.25,20,'1-1/4',1.38,8.75,8.75,'R57',18,6.12],
+    ['14',23.75,2.75,20.75,20,'1-3/8',1.5,9.25,9.25,'R61',19.38,6.5],
+    ['16',27,3,23.75,20,'1-1/2',1.62,10,10,'R65',22.25,7],
+    ['18',29.25,3.25,25.75,20,'1-5/8',1.75,10.75,10.75,'R69',24.12,7.25],
+    ['20',32,3.5,28.5,24,'1-5/8',1.75,11.25,11.5,'R73',26.88,7.5],
+    ['24',37,4,33,24,'1-7/8',2,13,13.25,'R77',31.12,8]
+  ],
+  '900': [
+    ['1',5.88,1.12,4,4,'7/8',1,5,5,'R16',3.12,2.88],
+    ['1-1/4',6.25,1.12,4.38,4,'7/8',1,5,5,'R18',3.5,2.88],
+    ['1-1/2',7,1.25,4.88,4,'1',1.12,5.5,5.5,'R20',3.88,3.25],
+    ['2',8.5,1.5,6.5,8,'7/8',1,5.75,5.75,'R24',5.62,4],
+    ['2-1/2',9.62,1.62,7.5,8,'1',1.12,6.25,6.25,'R27',6.5,4.12],
+    ['3',9.5,1.5,7.5,8,'7/8',1,5.75,5.75,'R31',6.62,4],
+    ['4',11.5,1.75,9.25,8,'1-1/8',1.25,6.75,6.75,'R37',8.12,4.5],
+    ['5',13.75,2,11,8,'1-1/4',1.38,7.5,7.5,'R41',9.75,5],
+    ['6',15,2.19,12.5,12,'1-1/8',1.25,7.5,7.75,'R45',11.38,5.5],
+    ['8',18.5,2.5,15.5,12,'1-3/8',1.5,8.75,8.75,'R49',14.12,6.38],
+    ['10',21.5,2.75,18.5,16,'1-3/8',1.5,9.25,9.25,'R53',17.12,7.25],
+    ['12',24,3.12,21,20,'1-3/8',1.5,10,10,'R57',19.62,7.88],
+    ['14',25.25,3.38,22,20,'1-1/2',1.62,10.75,11,'R62',20.5,8.38],
+    ['16',27.75,3.5,24.25,20,'1-5/8',1.75,11.25,11.5,'R66',22.62,8.5]
+  ],
+  '1500': [
+    ['1',5.88,1.12,4,4,'7/8',1,5,5,'R16',3.12,2.88],
+    ['1-1/4',6.25,1.12,4.38,4,'7/8',1,5,5,'R18',3.5,2.88],
+    ['1-1/2',7,1.25,4.88,4,'1',1.12,5.5,5.5,'R20',3.88,3.25],
+    ['2',8.5,1.5,6.5,8,'7/8',1,5.75,5.75,'R24',5.62,4],
+    ['2-1/2',9.62,1.62,7.5,8,'1',1.12,6.25,6.25,'R27',6.5,4.12],
+    ['3',10.5,1.88,8,8,'1-1/8',1.25,7,7,'R35',6.88,4.62],
+    ['4',12.25,2.12,9.5,8,'1-1/4',1.38,7.75,7.75,'R39',8.25,4.88],
+    ['5',14.75,2.88,11.5,8,'1-1/2',1.62,9.75,9.75,'R44',10,6.12],
+    ['6',15.5,3.25,12.5,12,'1-3/8',1.5,10.25,10.5,'R46',11.12,6.75],
+    ['8',19,3.62,15.5,12,'1-5/8',1.75,11.5,11.75,'R50',13.88,8.38],
+    ['10',23,4.25,19,12,'1-7/8',2,13.25,13.5,'R54',17.12,10],
+    ['12',26.5,4.88,22.5,16,'2',2.12,14.75,15.25,'R58',20.5,11.12]
+  ],
+  '2500': [
+    ['1/2',5.25,1.19,3.5,4,'3/4',0.88,4.75,4.75,'R13',2.75,2.88],
+    ['3/4',5.5,1.25,3.75,4,'3/4',0.88,5,5,'R16',3,3.12],
+    ['1',6.25,1.38,4.25,4,'7/8',1,5.5,5.5,'R18',3.38,3.5],
+    ['1-1/4',7.25,1.5,5.12,4,'1',1.12,6,6,'R21',4.12,3.75],
+    ['1-1/2',8,1.75,5.75,4,'1-1/8',1.25,6.75,6.75,'R23',4.62,4.38],
+    ['2',9.25,2,6.75,8,'1',1.12,7,7,'R26',5.75,5],
+    ['2-1/2',10.5,2.25,7.75,8,'1-1/8',1.25,7.75,8,'R28',6.62,5.62],
+    ['3',12,2.62,9,8,'1-1/4',1.38,8.75,9,'R32',7.75,6.62],
+    ['4',14,3,10.75,8,'1-1/2',1.62,10,10.25,'R38',9.25,7.5],
+    ['5',16.5,3.62,12.75,8,'1-3/4',1.88,11.75,12.25,'R42',11.38,9],
+    ['6',19,4.25,14.5,8,'2',2.12,13.5,14,'R47',12.5,10.75],
+    ['8',21.75,5,17.25,12,'2',2.12,15,15.5,'R51',15.25,12.5],
+    ['10',26.5,6.5,21.25,12,'2-1/2',2.62,19.25,20,'R55',18.75,16.5],
+    ['12',30,7.25,24.38,12,'2-3/4',2.88,21.25,22,'R60',21.62,18.25]
+  ]
+};
+
+var flgCls = '150', flgNps = '4';
+function renderFlanges() {
+  var classes = Object.keys(FLANGES_RAW);
+  $('flg-classes').innerHTML = classes.map(function(c) {
+    return '<button type="button" class="pill ' + (c === flgCls ? 'active' : '') + '" data-c="' + c + '">' + c + '#</button>';
+  }).join('');
+  $('flg-classes').querySelectorAll('.pill').forEach(function(b) {
+    b.onclick = function() { flgCls = b.dataset.c; renderFlanges(); };
+  });
+
+  var rows = FLANGES_RAW[flgCls];
+  var map = {};
+  rows.forEach(function(r) { map[normKey(r[0])] = r; });
+  if (!map[flgNps]) flgNps = normKey(rows[0][0]);
+
+  $('flg-nps-grid').innerHTML = NPS_LIST.map(function(x) {
+    var k = normKey(x.nps);
+    return '<button type="button" class="nps-btn ' + (k === flgNps ? 'active' : '') + '" ' + (map[k] ? '' : 'disabled') + ' data-n="' + k + '">' + withIn(k) + '</button>';
+  }).join('');
+  $('flg-nps-grid').querySelectorAll('.nps-btn:not(:disabled)').forEach(function(b) {
+    b.onclick = function() { flgNps = b.dataset.n; renderFlanges(); };
+  });
+
+  var r = map[flgNps];
+  var wrench = HEX_WRENCH[r[5]] ? withIn(HEX_WRENCH[r[5]]) : '—';
+  $('flg-badge').textContent = 'OD ' + fmtFIF(getOd(flgNps)) + ' • BCD ' + fmtFIF(r[3]);
+  $('flg-metrics').innerHTML =
+    '<div class="mbox"><div class="mlbl">Bolt Count</div><div class="mval">' + r[4] + ' Studs</div><div class="msub">Hole Dia ' + fmtFIF(r[6]) + '</div></div>' +
+    '<div class="mbox"><div class="mlbl">Bolt Diameter</div><div class="mval">' + withIn(r[5]) + '</div><div class="msub">UNC / 8-UN Stud</div></div>' +
+    '<div class="mbox"><div class="mlbl">Wrench Size</div><div class="mval">' + wrench + '</div><div class="msub">Heavy Hex Nut</div></div>' +
+    '<div class="mbox"><div class="mlbl">RF Stud Len</div><div class="mval">' + fmtFIF(r[7]) + '</div><div class="msub">Double-end stud</div></div>' +
+    '<div class="mbox"><div class="mlbl">RTJ Stud Len</div><div class="mval">' + (r[8] ? fmtFIF(r[8]) : '—') + '</div><div class="msub">RTJ Ring ' + r[9] + '</div></div>' +
+    '<div class="mbox"><div class="mlbl">Gasket OD</div><div class="mval">' + fmtFIF(r[10]) + '</div><div class="msub">Ring gasket</div></div>';
+  $('flg-table').innerHTML = '<thead><tr><th>NPS</th><th>OD</th><th>Thk</th><th>BCD</th><th>Studs</th><th>RF</th><th>RTJ</th><th>Ring</th><th>Gask</th></tr></thead><tbody>' +
+    rows.map(function(x) {
+      return '<tr class="' + (normKey(x[0]) === flgNps ? 'hl' : '') + '"><td>' + withIn(x[0]) + '</td><td>' + fmtFIF(x[1]) + '</td><td>' + fmtFIF(x[2]) + '</td><td>' + fmtFIF(x[3]) + '</td><td>' + x[4] + '×' + withIn(x[5]) + '</td><td>' + fmtFIF(x[7]) + '</td><td>' + (x[8] ? fmtFIF(x[8]) : '—') + '</td><td>' + x[9] + '</td><td>' + fmtFIF(x[10]) + '</td></tr>';
+    }).join('') + '</tbody>';
+}
+renderFlanges();
+
+var tqCls = '150', tqNps = '4';
+function calcBoltTorque(studStr, K) {
+  var d = parseDim(studStr);
+  if (!d) return 0;
+  return (K * d * (39375 * d * d)) / 12;
+}
+function renderTorque() {
+  var classes = Object.keys(FLANGES_RAW);
+  $('tq-classes').innerHTML = classes.map(function(c) {
+    return '<button type="button" class="pill ' + (c === tqCls ? 'active' : '') + '" data-c="' + c + '">' + c + '#</button>';
+  }).join('');
+  $('tq-classes').querySelectorAll('.pill').forEach(function(b) {
+    b.onclick = function() { tqCls = b.dataset.c; renderTorque(); };
+  });
+
+  var rows = FLANGES_RAW[tqCls];
+  var map = {};
+  rows.forEach(function(r) { map[normKey(r[0])] = r; });
+  if (!map[tqNps]) tqNps = normKey(rows[0][0]);
+
+  $('tq-nps-grid').innerHTML = NPS_LIST.map(function(x) {
+    var k = normKey(x.nps);
+    return '<button type="button" class="nps-btn ' + (k === tqNps ? 'active' : '') + '" ' + (map[k] ? '' : 'disabled') + ' data-n="' + k + '">' + withIn(k) + '</button>';
+  }).join('');
+  $('tq-nps-grid').querySelectorAll('.nps-btn:not(:disabled)').forEach(function(b) {
+    b.onclick = function() { tqNps = b.dataset.n; renderTorque(); };
+  });
+
+  var K = parseFloat($('tq-k').value) || 0.15;
+  var r = map[tqNps];
+  var tq100 = Math.round(calcBoltTorque(r[5], K));
+  var wrench = HEX_WRENCH[r[5]] ? withIn(HEX_WRENCH[r[5]]) : '—';
+
+  $('tq-metrics').innerHTML =
+    '<div class="mbox"><div class="mlbl">100% Target Torque</div><div class="mval">' + tq100 + ' ft-lbs</div><div class="msub">Pass 3 (Star) &amp; Pass 4 (Circular)</div></div>' +
+    '<div class="mbox"><div class="mlbl">Pass 1 (30% Star)</div><div class="mval">' + Math.round(tq100 * 0.3) + ' ft-lbs</div><div class="msub">Seat gasket &amp; check gap</div></div>' +
+    '<div class="mbox"><div class="mlbl">Pass 2 (60% Star)</div><div class="mval">' + Math.round(tq100 * 0.6) + ' ft-lbs</div><div class="msub">Even preload buildup</div></div>' +
+    '<div class="mbox"><div class="mlbl">Stud Spec</div><div class="mval">' + r[4] + ' × ' + withIn(r[5]) + '</div><div class="msub">Wrench ' + wrench + ' • K = ' + K.toFixed(2) + '</div></div>';
+
+  $('tq-tbl-title').textContent = tqCls + '# Flange Torque Chart (K = ' + K.toFixed(2) + ')';
+  $('tq-table').innerHTML = '<thead><tr><th>NPS</th><th>Studs</th><th>30% Pass</th><th>60% Pass</th><th>100% Target</th></tr></thead><tbody>' +
+    rows.map(function(x) {
+      var full = Math.round(calcBoltTorque(x[5], K));
+      return '<tr class="' + (normKey(x[0]) === tqNps ? 'hl' : '') + '"><td>' + withIn(x[0]) + '</td><td>' + x[4] + '×' + withIn(x[5]) + '</td><td>' + Math.round(full * 0.3) + ' ft-lb</td><td>' + Math.round(full * 0.6) + ' ft-lb</td><td><strong>' + full + ' ft-lb</strong></td></tr>';
+    }).join('') + '</tbody>';
+}
+$('tq-k').onchange = renderTorque;
+renderTorque();
+</script>
+
+<script>
+var PIPE_SCHEDULES = {
+  '1/2': {'10 / 10S':0.083,'STD / 40 / 40S':0.109,'XS / 80 / 80S':0.147,'160':0.188,'XXS':0.294},
+  '3/4': {'10 / 10S':0.083,'STD / 40 / 40S':0.113,'XS / 80 / 80S':0.154,'160':0.219,'XXS':0.308},
+  '1': {'10 / 10S':0.109,'STD / 40 / 40S':0.133,'XS / 80 / 80S':0.179,'160':0.250,'XXS':0.358},
+  '1-1/4': {'10 / 10S':0.109,'STD / 40 / 40S':0.140,'XS / 80 / 80S':0.191,'160':0.250,'XXS':0.382},
+  '1-1/2': {'10 / 10S':0.109,'STD / 40 / 40S':0.145,'XS / 80 / 80S':0.200,'160':0.281,'XXS':0.400},
+  '2': {'10 / 10S':0.109,'STD / 40 / 40S':0.154,'XS / 80 / 80S':0.218,'160':0.344,'XXS':0.436},
+  '2-1/2': {'10 / 10S':0.120,'STD / 40 / 40S':0.203,'XS / 80 / 80S':0.276,'160':0.375,'XXS':0.552},
+  '3': {'10 / 10S':0.120,'STD / 40 / 40S':0.216,'XS / 80 / 80S':0.300,'160':0.438,'XXS':0.600},
+  '4': {'10 / 10S':0.120,'STD / 40 / 40S':0.237,'XS / 80 / 80S':0.337,'120':0.438,'160':0.531,'XXS':0.674},
+  '5': {'10 / 10S':0.134,'STD / 40 / 40S':0.258,'XS / 80 / 80S':0.375,'120':0.500,'160':0.625,'XXS':0.750},
+  '6': {'10 / 10S':0.134,'STD / 40 / 40S':0.280,'XS / 80 / 80S':0.432,'120':0.562,'160':0.719,'XXS':0.864},
+  '8': {'10 / 10S':0.148,'20':0.250,'30':0.277,'STD / 40 / 40S':0.322,'60':0.406,'XS / 80 / 80S':0.500,'120':0.719,'160':0.906,'XXS':0.875},
+  '10': {'10 / 10S':0.165,'20':0.250,'30':0.307,'STD / 40 / 40S':0.365,'XS / 60 / 80S':0.500,'80':0.594,'120':0.844,'160':1.125},
+  '12': {'10 / 10S':0.180,'20':0.250,'30':0.330,'STD / 40S':0.375,'40':0.406,'XS / 80S':0.500,'80':0.688,'120':1.000,'160':1.312},
+  '14': {'10 / 10S':0.250,'20':0.312,'STD / 30':0.375,'40':0.438,'XS':0.500,'80':0.750,'160':1.406},
+  '16': {'10 / 10S':0.250,'20':0.312,'STD / 30':0.375,'40 / XS':0.500,'80':0.844,'160':1.594},
+  '18': {'10 / 10S':0.250,'20':0.312,'STD':0.375,'30':0.438,'XS':0.500,'40':0.562,'80':0.938},
+  '20': {'10 / 10S':0.250,'STD / 20':0.375,'XS / 30':0.500,'40':0.594,'80':1.031},
+  '24': {'10 / 10S':0.250,'STD / 20':0.375,'XS / 30':0.500,'30':0.562,'40':0.688,'80':1.219}
+};
+
+(function() {
+  $('rg-nps').innerHTML = NPS_LIST.map(function(x) {
+    return '<option value="' + x.nps + '" ' + (x.nps === '4' ? 'selected' : '') + '>' + withIn(x.nps) + '</option>';
+  }).join('');
+
+  function syncSch(nps, keep) {
+    var schs = PIPE_SCHEDULES[nps];
+    var list = Object.keys(schs);
+    var chosen = (keep && schs[keep]) ? keep : (schs['STD / 40 / 40S'] ? 'STD / 40 / 40S' : list[0]);
+    $('rg-sch').innerHTML = list.map(function(s) {
+      return '<option value="' + s + '" ' + (s === chosen ? 'selected' : '') + '>' + s + '</option>';
+    }).join('');
+    return { schs: schs, chosen: chosen };
+  }
+
+  function updatePipe() {
+    var nps = $('rg-nps').value;
+    var od = getOd(nps);
+    var info = syncSch(nps, $('rg-sch').value);
+    var wall = info.schs[info.chosen];
+    var id = od - 2 * wall;
+    var dryLbFt = 10.69 * (od - wall) * wall;
+    var watLbFt = 0.3405 * id * id;
+    var lenFt = parseDim($('rg-len').value) / 12;
+    var wet = $('rg-water').value === '1';
+    var total = lenFt * (dryLbFt + (wet ? watLbFt : 0));
+
+    $('rg-res').innerHTML =
+      '<div class="result-main">' + total.toFixed(1) + ' lbs</div>' +
+      '<div class="result-sub">OD ' + fmtFIF(od) + ' • ID ' + fmtFIF(id) + ' • Wall ' + fmtFIF(wall) + '<br>Dry: ' + dryLbFt.toFixed(2) + ' lb/ft • Water: ' + watLbFt.toFixed(2) + ' lb/ft</div>';
+
+    $('pipe-table').innerHTML = '<thead><tr><th>Schedule</th><th>Wall</th><th>ID</th><th>Dry lb/ft</th><th>Water lb/ft</th><th>Filled lb/ft</th></tr></thead><tbody>' +
+      Object.keys(info.schs).map(function(k) {
+        var w = info.schs[k], i = od - 2 * w, d = 10.69 * (od - w) * w, wt = 0.3405 * i * i;
+        return '<tr class="' + (k === info.chosen ? 'hl' : '') + '"><td>' + k + '</td><td>' + fmtFIF(w) + '</td><td>' + fmtFIF(i) + '</td><td>' + d.toFixed(2) + '</td><td>' + wt.toFixed(2) + '</td><td>' + (d + wt).toFixed(2) + '</td></tr>';
+      }).join('') + '</tbody>';
+  }
+
+  $('rg-nps').onchange = function() { syncSch($('rg-nps').value, null); updatePipe(); };
+  $('rg-sch').onchange = updatePipe;
+  $('rg-len').oninput = updatePipe;
+  $('rg-water').onchange = updatePipe;
+  syncSch('4', null);
+  updatePipe();
+})();
+</script>
+
+<script>
+var TAKEOFFS = {
+  bw: {
+    name: 'Butt Weld (B16.9)',
+    defaultGap: 0.125,
+    fittings: [
+      {k:'el90',label:'90° LR Elbow'},{k:'el45',label:'45° LR Elbow'},{k:'sr90',label:'90° SR Elbow'},
+      {k:'tee',label:'Tee (Center-to-End)'},{k:'wn150',label:'150# WN Flange'},{k:'wn300',label:'300# WN Flange'},
+      {k:'wn600',label:'600# WN Flange'},{k:'none',label:'Plain End (0)'}
+    ],
+    rows: [
+      {nps:'1/2',el90:1.5,el45:0.625,sr90:null,tee:1,wn150:1.875,wn300:2.0625,wn600:2.0625},
+      {nps:'3/4',el90:1.5,el45:0.75,sr90:null,tee:1.125,wn150:2.0625,wn300:2.25,wn600:2.25},
+      {nps:'1',el90:1.5,el45:0.875,sr90:1,tee:1.5,wn150:2.1875,wn300:2.4375,wn600:2.4375},
+      {nps:'1-1/4',el90:1.875,el45:1,sr90:1.25,tee:1.875,wn150:2.25,wn300:2.5625,wn600:2.625},
+      {nps:'1-1/2',el90:2.25,el45:1.125,sr90:1.5,tee:2.25,wn150:2.4375,wn300:2.6875,wn600:2.75},
+      {nps:'2',el90:3,el45:1.375,sr90:2,tee:2.5,wn150:2.5,wn300:2.75,wn600:2.875},
+      {nps:'2-1/2',el90:3.75,el45:1.75,sr90:2.5,tee:3,wn150:2.75,wn300:3,wn600:3.125},
+      {nps:'3',el90:4.5,el45:2,sr90:3,tee:3.375,wn150:2.75,wn300:3.125,wn600:3.25},
+      {nps:'4',el90:6,el45:2.5,sr90:4,tee:4.125,wn150:3,wn300:3.375,wn600:4},
+      {nps:'5',el90:7.5,el45:3.125,sr90:5,tee:4.875,wn150:3.5,wn300:3.875,wn600:4.5},
+      {nps:'6',el90:9,el45:3.75,sr90:6,tee:5.625,wn150:3.5,wn300:3.875,wn600:4.625},
+      {nps:'8',el90:12,el45:5,sr90:8,tee:7,wn150:4,wn300:4.375,wn600:5.25},
+      {nps:'10',el90:15,el45:6.25,sr90:10,tee:8.5,wn150:4,wn300:4.625,wn600:6},
+      {nps:'12',el90:18,el45:7.5,sr90:12,tee:10,wn150:4.5,wn300:5.125,wn600:6.125},
+      {nps:'14',el90:21,el45:8.75,sr90:14,tee:11,wn150:5,wn300:5.625,wn600:6.5},
+      {nps:'16',el90:24,el45:10,sr90:16,tee:12,wn150:5,wn300:5.75,wn600:7},
+      {nps:'18',el90:27,el45:11.25,sr90:18,tee:13.5,wn150:5.5,wn300:6.25,wn600:7.25},
+      {nps:'20',el90:30,el45:12.5,sr90:20,tee:15,wn150:5.6875,wn300:6.375,wn600:7.5},
+      {nps:'24',el90:36,el45:15,sr90:24,tee:17,wn150:6,wn300:6.625,wn600:8}
+    ]
+  },
+  npt150: {
+    name: '150# Malleable NPT (B16.3)',
+    defaultGap: 0,
+    fittings: [
+      {k:'el90',label:'90° Threaded Elbow'},{k:'el45',label:'45° Threaded Elbow'},{k:'tee',label:'Threaded Tee'},
+      {k:'cplg',label:'Coupling (Half Net)'},{k:'none',label:'Plain End (0)'}
+    ],
+    rows: [
+      {nps:'1/8',el90:0.4261,el45:0.2961,tee:0.4261,cplg:0.2161,makeup:0.2639},
+      {nps:'1/4',el90:0.4082,el45:0.3282,tee:0.4082,cplg:0.1282,makeup:0.4018},
+      {nps:'3/8',el90:0.5422,el45:0.3922,tee:0.5422,cplg:0.1722,makeup:0.4078},
+      {nps:'1/2',el90:0.5863,el45:0.3463,tee:0.5863,cplg:0.1363,makeup:0.5337},
+      {nps:'3/4',el90:0.7643,el45:0.4343,tee:0.7643,cplg:0.2143,makeup:0.5457},
+      {nps:'1',el90:0.8172,el45:0.4372,tee:0.8172,cplg:0.1522,makeup:0.6828},
+      {nps:'1-1/4',el90:1.0432,el45:0.5832,tee:1.0432,cplg:0.2632,makeup:0.7068},
+      {nps:'1-1/2',el90:1.2165,el45:0.7065,tee:1.2165,cplg:0.3515,makeup:0.7235},
+      {nps:'2',el90:1.4935,el45:0.9235,tee:1.4935,cplg:0.5085,makeup:0.7565},
+      {nps:'2-1/2',el90:1.5625,el45:0.8125,tee:1.5625,cplg:0.3025,makeup:1.1375},
+      {nps:'3',el90:1.8800,el45:0.9700,tee:1.8800,cplg:0.3900,makeup:1.2000},
+      {nps:'4',el90:2.4900,el45:1.3100,tee:2.4900,cplg:0.5450,makeup:1.3000}
+    ]
+  },
+  npt3000: {
+    name: '3000# Forged NPT (B16.11)',
+    defaultGap: 0,
+    fittings: [
+      {k:'el90',label:'90° Forged Elbow'},{k:'el45',label:'45° Forged Elbow'},{k:'tee',label:'Forged Tee'},
+      {k:'cplg',label:'Forged Coupling (Half)'},{k:'none',label:'Plain End (0)'}
+    ],
+    rows: [
+      {nps:'1/8',el90:0.5661,el45:0.4061,tee:0.5661,cplg:0.3661,makeup:0.2639},
+      {nps:'1/4',el90:0.5782,el45:0.3482,tee:0.5782,cplg:0.2882,makeup:0.4018},
+      {nps:'3/8',el90:0.6922,el45:0.4622,tee:0.6922,cplg:0.3422,makeup:0.4078},
+      {nps:'1/2',el90:0.7663,el45:0.4463,tee:0.7663,cplg:0.4063,makeup:0.5337},
+      {nps:'3/4',el90:0.9543,el45:0.5543,tee:0.9543,cplg:0.4543,makeup:0.5457},
+      {nps:'1',el90:1.0472,el45:0.6172,tee:1.0472,cplg:0.5022,makeup:0.6828},
+      {nps:'1-1/4',el90:1.3032,el45:0.6732,tee:1.3032,cplg:0.6032,makeup:0.7068},
+      {nps:'1-1/2',el90:1.6365,el45:0.9665,tee:1.6365,cplg:0.8365,makeup:0.7235},
+      {nps:'2',el90:1.7635,el45:0.9735,tee:1.7635,cplg:0.9335,makeup:0.7565},
+      {nps:'2-1/2',el90:2.1325,el45:0.9125,tee:2.1325,cplg:0.6725,makeup:1.1375},
+      {nps:'3',el90:2.5400,el45:1.3200,tee:2.5400,cplg:0.9250,makeup:1.2000},
+      {nps:'4',el90:3.1900,el45:1.8100,tee:3.1900,cplg:1.0800,makeup:1.3000}
+    ]
+  },
+  sw3: {
+    name: '3000# Socket Weld (B16.11)',
+    defaultGap: 0.0625,
+    fittings: [
+      {k:'el90',label:'90° SW Elbow'},{k:'el45',label:'45° SW Elbow'},{k:'tee',label:'SW Tee'},
+      {k:'cplg',label:'SW Coupling (Half)'},{k:'none',label:'Plain End (0)'}
+    ],
+    rows: [
+      {nps:'1/2',el90:0.625,el45:0.4375,tee:0.625,cplg:0.1875},
+      {nps:'3/4',el90:0.75,el45:0.5,tee:0.75,cplg:0.1875},
+      {nps:'1',el90:0.875,el45:0.5625,tee:0.875,cplg:0.25},
+      {nps:'1-1/4',el90:1.0625,el45:0.6875,tee:1.0625,cplg:0.25},
+      {nps:'1-1/2',el90:1.25,el45:0.8125,tee:1.25,cplg:0.25},
+      {nps:'2',el90:1.5,el45:1,tee:1.5,cplg:0.375}
+    ]
+  },
+  sw6: {
+    name: '6000# Socket Weld (B16.11)',
+    defaultGap: 0.0625,
+    fittings: [
+      {k:'el90',label:'90° SW Elbow'},{k:'el45',label:'45° SW Elbow'},{k:'tee',label:'SW Tee'},
+      {k:'cplg',label:'SW Coupling (Half)'},{k:'none',label:'Plain End (0)'}
+    ],
+    rows: [
+      {nps:'1/2',el90:0.75,el45:0.5,tee:0.75,cplg:0.1875},
+      {nps:'3/4',el90:0.875,el45:0.5625,tee:0.875,cplg:0.25},
+      {nps:'1',el90:1.0625,el45:0.6875,tee:1.0625,cplg:0.25},
+      {nps:'1-1/4',el90:1.25,el45:0.8125,tee:1.25,cplg:0.25},
+      {nps:'1-1/2',el90:1.5,el45:1,tee:1.5,cplg:0.375},
+      {nps:'2',el90:1.625,el45:1.125,tee:1.625,cplg:0.375}
+    ]
+  },
+  pvc40: {
+    name: 'PVC Sch 40 (D2466)',
+    defaultGap: 0,
+    fittings: [
+      {k:'el90',label:'90° Sch 40 Elbow'},{k:'el45',label:'45° Sch 40 Elbow'},{k:'tee',label:'Sch 40 Tee'},
+      {k:'cplg',label:'Coupling (Half Stop)'},{k:'none',label:'Plain End (0)'}
+    ],
+    rows: [
+      {nps:'1/2',el90:0.5,el45:0.25,tee:0.5,cplg:0.0625},
+      {nps:'3/4',el90:0.5625,el45:0.3125,tee:0.5625,cplg:0.0625},
+      {nps:'1',el90:0.6875,el45:0.3125,tee:0.6875,cplg:0.0625},
+      {nps:'1-1/4',el90:0.875,el45:0.375,tee:0.875,cplg:0.0625},
+      {nps:'1-1/2',el90:1.0625,el45:0.4375,tee:1.0625,cplg:0.0625},
+      {nps:'2',el90:1.3125,el45:0.5625,tee:1.3125,cplg:0.0625},
+      {nps:'2-1/2',el90:1.5625,el45:0.6875,tee:1.5625,cplg:0.09375},
+      {nps:'3',el90:1.875,el45:0.75,tee:1.875,cplg:0.09375},
+      {nps:'4',el90:2.3125,el45:1,tee:2.3125,cplg:0.09375},
+      {nps:'6',el90:3.5,el45:1.6875,tee:3.5,cplg:0.125},
+      {nps:'8',el90:4.5,el45:2,tee:4.5,cplg:0.125},
+      {nps:'10',el90:5.75,el45:2.5625,tee:5.75,cplg:0.1875},
+      {nps:'12',el90:6.875,el45:3.0625,tee:6.875,cplg:0.1875}
+    ]
+  },
+  pvc80: {
+    name: 'PVC / CPVC Sch 80 (D2467 / F439)',
+    defaultGap: 0,
+    fittings: [
+      {k:'el90',label:'90° Sch 80 Elbow'},{k:'el45',label:'45° Sch 80 Elbow'},{k:'tee',label:'Sch 80 Tee'},
+      {k:'cplg',label:'Coupling (Half Stop)'},{k:'flg',label:'Van Stone / Socket Flange'},{k:'none',label:'Plain End (0)'}
+    ],
+    rows: [
+      {nps:'1/2',el90:0.5,el45:0.25,tee:0.5,cplg:0.0625,flg:0.1875},
+      {nps:'3/4',el90:0.5625,el45:0.3125,tee:0.5625,cplg:0.0625,flg:0.1875},
+      {nps:'1',el90:0.6875,el45:0.375,tee:0.6875,cplg:0.0625,flg:0.1875},
+      {nps:'1-1/4',el90:0.875,el45:0.4375,tee:0.875,cplg:0.0625,flg:0.25},
+      {nps:'1-1/2',el90:1,el45:0.5,tee:1,cplg:0.0625,flg:0.25},
+      {nps:'2',el90:1.25,el45:0.625,tee:1.25,cplg:0.0625,flg:0.25},
+      {nps:'2-1/2',el90:1.5,el45:0.75,tee:1.5,cplg:0.125,flg:0.3125},
+      {nps:'3',el90:1.8125,el45:0.875,tee:1.8125,cplg:0.125,flg:0.3125},
+      {nps:'4',el90:2.3125,el45:1.125,tee:2.3125,cplg:0.125,flg:0.375},
+      {nps:'6',el90:3.5,el45:1.6875,tee:3.5,cplg:0.125,flg:0.5},
+      {nps:'8',el90:4.5,el45:2.0625,tee:4.5,cplg:0.1875,flg:0.5625},
+      {nps:'10',el90:5.75,el45:2.625,tee:5.75,cplg:0.1875,flg:0.6875},
+      {nps:'12',el90:6.875,el45:3.125,tee:6.875,cplg:0.25,flg:0.75}
+    ]
+  },
+  copper: {
+    name: 'Copper Sweat (B16.22)',
+    defaultGap: 0,
+    fittings: [
+      {k:'el90',label:'90° Wrot Elbow'},{k:'el45',label:'45° Wrot Elbow'},{k:'tee',label:'Wrot Tee'},
+      {k:'cplg',label:'Coupling (Half Stop)'},{k:'none',label:'Plain End (0)'}
+    ],
+    rows: [
+      {nps:'1/2',el90:0.4375,el45:0.25,tee:0.4375,cplg:0.0625},
+      {nps:'3/4',el90:0.5625,el45:0.3125,tee:0.5625,cplg:0.0625},
+      {nps:'1',el90:0.75,el45:0.375,tee:0.75,cplg:0.0625},
+      {nps:'1-1/4',el90:0.9375,el45:0.4375,tee:0.9375,cplg:0.0625},
+      {nps:'1-1/2',el90:1.125,el45:0.5625,tee:1.125,cplg:0.0625},
+      {nps:'2',el90:1.4375,el45:0.6875,tee:1.4375,cplg:0.0625},
+      {nps:'2-1/2',el90:1.75,el45:0.8125,tee:1.75,cplg:0.0625},
+      {nps:'3',el90:2.0625,el45:0.9375,tee:2.0625,cplg:0.0625},
+      {nps:'4',el90:2.6875,el45:1.1875,tee:2.6875,cplg:0.125},
+      {nps:'6',el90:3.875,el45:1.6875,tee:3.875,cplg:0.125}
+    ]
+  }
+};
+
+var tkSys = 'bw', extraValveWelds = 0, valveBreakdown = '';
+function renderTakeoffSystem() {
+  $('tk-systems').innerHTML = Object.keys(TAKEOFFS).map(function(k) {
+    return '<button type="button" class="pill ' + (k === tkSys ? 'active' : '') + '" data-k="' + k + '">' + TAKEOFFS[k].name + '</button>';
+  }).join('');
+  $('tk-systems').querySelectorAll('.pill').forEach(function(b) {
+    b.onclick = function() {
+      tkSys = b.dataset.k;
+      extraValveWelds = 0; valveBreakdown = ''; $('cut-valve').value = '0'; $('valve-note').textContent = 'No in-line valve deducted';
+      $('takeoff-gap').value = String(TAKEOFFS[tkSys].defaultGap);
+      renderTakeoffSystem();
+    };
+  });
+
+  var sys = TAKEOFFS[tkSys];
+  var prevNps = $('cut-nps').value;
+  var hasPrev = sys.rows.some(function(r) { return r.nps === prevNps; });
+  $('cut-nps').innerHTML = sys.rows.map(function(r) {
+    var sel = (hasPrev ? r.nps === prevNps : (r.nps === '4' || r.nps === '1')) ? 'selected' : '';
+    return '<option value="' + r.nps + '" ' + sel + '>' + withIn(r.nps) + '</option>';
+  }).join('');
+
+  var prevA = $('cut-a').value, prevB = $('cut-b').value;
+  $('cut-a').innerHTML = sys.fittings.map(function(f) {
+    return '<option value="' + f.k + '" ' + (f.k === prevA ? 'selected' : '') + '>' + f.label + '</option>';
+  }).join('');
+  $('cut-b').innerHTML = sys.fittings.map(function(f) {
+    return '<option value="' + f.k + '" ' + (f.k === prevB ? 'selected' : '') + '>' + f.label + '</option>';
+  }).join('');
+  calcTakeoff();
+}
+
+function calcTakeoff() {
+  var sys = TAKEOFFS[tkSys];
+  var nps = $('cut-nps').value;
+  var row = sys.rows.find(function(r) { return r.nps === nps; }) || sys.rows[0];
+
+  ['cut-a', 'cut-b'].forEach(function(selId) {
+    var sel = $(selId);
+    Array.from(sel.options).forEach(function(opt) {
+      opt.disabled = (opt.value !== 'none' && row[opt.value] == null);
+    });
+    if (sel.options[sel.selectedIndex] && sel.options[sel.selectedIndex].disabled) {
+      sel.value = 'el90';
+    }
+  });
+
+  var kA = $('cut-a').value, kB = $('cut-b').value;
+  var tkA = kA === 'none' ? 0 : (row[kA] || 0);
+  var tkB = kB === 'none' ? 0 : (row[kB] || 0);
+  var cc = parseDim($('cut-cc').value);
+  var gap = parseFloat($('takeoff-gap').value) || 0;
+  var vlv = parseDim($('cut-valve').value);
+  var endWelds = (kA !== 'none' ? 1 : 0) + (kB !== 'none' ? 1 : 0);
+  var totalWelds = endWelds + extraValveWelds;
+  var totGap = totalWelds * gap;
+  var cut = cc - tkA - tkB - vlv - totGap;
+  var isNpt = tkSys === 'npt150' || tkSys === 'npt3000';
+
+  $('cut-res').innerHTML =
+    '<div class="result-main">Cut Pipe: ' + fmtFIF(cut) + '</div>' +
+    '<div class="result-sub">C-C ' + fmtFIF(cc) + ' − End A ' + fmtFIF(tkA) + ' − End B ' + fmtFIF(tkB) + (vlv > 0 ? ' − Valve ' + fmtFIF(vlv) : '') + (totGap > 0 ? ' − ' + totalWelds + ' Gaps (' + fmtFIF(totGap) + ')' : '') + (isNpt ? ' (Net w/ ' + fmtFIF(row.makeup) + ' NPT makeup)' : '') + (valveBreakdown ? '<br>' + valveBreakdown : '') + '</div>';
+
+  $('tk-tbl-title').textContent = sys.name + (isNpt ? ' Net Takeoff Chart' : ' Chart');
+  var cols = Object.keys(row).filter(function(k) { return k !== 'nps'; });
+  $('tk-table').innerHTML = '<thead><tr><th>NPS</th>' + cols.map(function(c) { return '<th>' + c.toUpperCase() + '</th>'; }).join('') + '</tr></thead><tbody>' +
+    sys.rows.map(function(r) {
+      return '<tr class="' + (r.nps === nps ? 'hl' : '') + '"><td>' + withIn(r.nps) + '</td>' + cols.map(function(c) { return '<td>' + fmtFIF(r[c]) + '</td>'; }).join('') + '</tr>';
+    }).join('') + '</tbody>';
+}
+
+['cut-cc','cut-nps','cut-a','cut-b','takeoff-gap','cut-valve'].forEach(function(id) {
+  $(id).oninput = calcTakeoff;
+  $(id).onchange = calcTakeoff;
+});
+$('clear-valve').onclick = function() {
+  $('cut-valve').value = '0'; extraValveWelds = 0; valveBreakdown = '';
+  $('valve-note').textContent = 'No in-line valve deducted';
+  calcTakeoff();
+};
+
+attachVoiceButton('mic-btn', 'cut-cc', 'mic-status', function(txt) {
+  var parsedVal = parseDim(txt);
+  $('cut-cc').value = parsedVal > 0 ? fmtFIF(parsedVal) : normalizeSpokenDim(txt);
+  calcTakeoff();
+});
+renderTakeoffSystem();
+
+(function() {
+  $('off-nps').innerHTML = '<option value="none">None (Center-to-Center Travel)</option>' +
+    TAKEOFFS.bw.rows.map(function(r) { return '<option value="' + r.nps + '">' + withIn(r.nps) + '</option>'; }).join('');
+
+  function calcOffset() {
+    var rise = parseDim($('off-rise').value);
+    var roll = parseDim($('off-roll').value);
+    var ang = parseFloat($('off-ang').value) || 45;
+    var rad = ang * Math.PI / 180;
+    var trueOff = Math.hypot(rise, roll);
+    var travel = trueOff / Math.sin(rad);
+    var run = trueOff / Math.tan(rad);
+    var nps = $('off-nps').value;
+    var tk = 0;
+    if (nps !== 'none') {
+      var row = TAKEOFFS.bw.rows.find(function(r) { return r.nps === nps; });
+      if (row) tk = (ang === 45 ? row.el45 : row.el90 * Math.tan(rad / 2)) * 2;
+    }
+    var cutPipe = travel - tk - (nps !== 'none' ? 0.25 : 0);
+
+    $('off-res').innerHTML =
+      '<div class="result-main">Travel: ' + fmtFIF(travel) + '</div>' +
+      '<div class="result-sub">True Offset: ' + fmtFIF(trueOff) + ' • Run: ' + fmtFIF(run) + (nps !== 'none' ? '<br>Cut Pipe (' + withIn(nps) + ' BW w/ 2× 1/8' + INCH + ' gaps): <strong>' + fmtFIF(cutPipe) + '</strong>' : '') + '</div>';
+    $('off-svg').innerHTML =
+      '<polygon points="55,120 140,120 265,45 180,45" fill="none" stroke="#3b5280" stroke-dasharray="4"/>' +
+      '<line x1="55" y1="120" x2="140" y2="120" stroke="#22d3ee" stroke-width="3"/>' +
+      '<line x1="140" y1="120" x2="265" y2="120" stroke="#94a3b8" stroke-width="2.5"/>' +
+      '<line x1="265" y1="120" x2="265" y2="45" stroke="#34d399" stroke-width="3"/>' +
+      '<line x1="55" y1="120" x2="265" y2="45" stroke="#fbbf24" stroke-width="4.5" stroke-linecap="round"/>' +
+      '<circle cx="55" cy="120" r="4" fill="#fbbf24"/>' +
+      '<circle cx="265" cy="45" r="4" fill="#fbbf24"/>' +
+      '<text x="78" y="138" fill="#22d3ee" font-family="monospace" font-size="11.5" font-weight="bold">Roll ' + fmtFIF(roll) + '</text>' +
+      '<text x="175" y="138" fill="#cbd5e1" font-family="monospace" font-size="11.5" font-weight="bold">Run ' + fmtFIF(run) + '</text>' +
+      '<text x="271" y="86" fill="#34d399" font-family="monospace" font-size="11.5" font-weight="bold">Rise ' + fmtFIF(rise) + '</text>' +
+      '<text x="108" y="69" fill="#fbbf24" font-family="monospace" font-size="12.5" font-weight="bold">Travel ' + fmtFIF(travel) + '</text>';
+  }
+
+  ['off-rise','off-roll','off-ang','off-nps'].forEach(function(id) {
+    $(id).oninput = calcOffset;
+    $(id).onchange = calcOffset;
+  });
+  calcOffset();
+})();
+</script>
+
+<script>
+var VALVES_FLG = {
+  '150': [
+    ['1/2',4.25,4.25,4.25,4.25,null,null],
+    ['3/4',4.625,4.625,4.625,4.625,null,null],
+    ['1',5,6.5,5,5,5.5,null],
+    ['1-1/4',5.5,7,5.5,5.5,6,null],
+    ['1-1/2',6.5,6.5,6.5,6.5,6.5,null],
+    ['2',7,8,7,8,7,1.69],
+    ['2-1/2',7.5,8.5,7.5,8.5,7.5,1.81],
+    ['3',8,9.5,8,9.5,8,1.81],
+    ['4',9,11.5,9,11.5,9,2.06],
+    ['5',10,13,10,13,10,2.19],
+    ['6',10.5,16,15.5,14,10.5,2.19],
+    ['8',11.5,19.5,18,19.5,11.5,2.38],
+    ['10',13,24.5,21,24.5,13,2.69],
+    ['12',14,27.5,24,27.5,14,3.06],
+    ['14',15,31,27,31,15,3.06],
+    ['16',16,36,30,34,16,3.38],
+    ['18',17,null,34,38.5,17,4.12],
+    ['20',18,null,36,38.5,18,5],
+    ['24',20,null,42,51,20,6.06]
+  ],
+  '300': [
+    ['1/2',5.5,6,5.5,6,null,null],
+    ['3/4',6,7,6,7,null,null],
+    ['1',6.5,8,6.5,8.5,6.5,null],
+    ['1-1/4',7,8.5,7,9,7,null],
+    ['1-1/2',7.5,9,7.5,9.5,7.5,null],
+    ['2',8.5,10.5,8.5,10.5,8.5,1.69],
+    ['2-1/2',9.5,11.5,9.5,11.5,9.5,1.81],
+    ['3',11.125,12.5,11.125,12.5,11.125,1.88],
+    ['4',12,14,12,14,12,2.12],
+    ['5',15,15.75,15,15.75,15,2.31],
+    ['6',15.875,17.5,15.875,17.5,15.875,2.31],
+    ['8',16.5,22,19.75,21,16.5,2.88],
+    ['10',18,24.5,22.375,24.5,18,3.25],
+    ['12',19.75,28,25.5,28,19.75,3.62],
+    ['14',30,null,30,33,30,4.62],
+    ['16',33,null,33,34,33,5.25],
+    ['18',36,null,36,38.5,36,5.88],
+    ['20',39,null,39,40,39,6.25],
+    ['24',45,null,45,53,45,7.12]
+  ],
+  '600': [
+    ['1/2',6.5,6.5,6.5,6.5,null,null],
+    ['3/4',7.5,7.5,7.5,7.5,null,null],
+    ['1',8.5,8.5,8.5,8.5,8.5,null],
+    ['1-1/4',9,9,9,9,9,null],
+    ['1-1/2',9.5,9.5,9.5,9.5,9.5,null],
+    ['2',11.5,11.5,11.5,11.5,11.5,null],
+    ['2-1/2',13,13,13,13,13,null],
+    ['3',14,14,14,14,14,null],
+    ['4',17,17,17,17,17,null],
+    ['5',20,20,20,20,20,null],
+    ['6',22,22,22,22,22,null],
+    ['8',26,26,26,26,26,null],
+    ['10',31,31,31,31,31,null],
+    ['12',33,33,33,33,33,null],
+    ['14',35,35,35,35,35,null],
+    ['16',39,39,39,39,39,null],
+    ['18',43,43,43,43,43,null],
+    ['20',47,47,47,47,47,null],
+    ['24',55,55,55,55,55,null]
+  ]
+};
+
+var VALVES_SW = {
+  '800': [
+    ['1/2',0.38,3.25,3.25,2.75,3.25,3.25,3.75],
+    ['3/4',0.5,3.625,3.625,3.125,3.625,3.625,4],
+    ['1',0.5,4.25,4.25,3.75,4.25,4.25,4.75],
+    ['1-1/4',0.5,5,5,4.25,5,5,5.5],
+    ['1-1/2',0.5,5.5,5.5,4.75,5.5,5.5,6],
+    ['2',0.62,6.5,6.5,5.5,6.5,6.5,7]
+  ],
+  '1500': [
+    ['1/2',0.38,3.75,3.75,3.25,3.75,3.75,4.25],
+    ['3/4',0.5,4.25,4.25,3.75,4.25,4.25,4.75],
+    ['1',0.5,5,5,4.5,5,5,5.5],
+    ['1-1/4',0.5,5.75,5.75,5.125,5.75,5.75,6.25],
+    ['1-1/2',0.5,6.5,6.5,5.75,6.5,6.5,7],
+    ['2',0.62,7.5,7.5,6.75,7.5,7.5,8]
+  ],
+  '2500': [
+    ['1/2',0.38,4.25,4.25,3.75,4.25,4.25,4.75],
+    ['3/4',0.5,5,5,4.5,5,5,5.5],
+    ['1',0.5,5.75,5.75,5.25,5.75,5.75,6.25],
+    ['1-1/4',0.5,6.5,6.5,6,6.5,6.5,7],
+    ['1-1/2',0.5,7.5,7.5,6.75,7.5,7.5,8],
+    ['2',0.62,8.5,8.5,7.75,8.5,8.5,9]
+  ]
+};
+
+var vlvEnd = 'RF', vlvCls = '150', vlvNps = '4';
+function renderValves() {
+  document.querySelectorAll('#vlv-ends .pill').forEach(function(b) {
+    b.classList.toggle('active', b.getAttribute('data-end') === vlvEnd);
+    b.onclick = function() {
+      vlvEnd = b.getAttribute('data-end');
+      vlvCls = vlvEnd === 'SW' ? '800' : '150';
+      renderValves();
+    };
+  });
+
+  var isSW = vlvEnd === 'SW';
+  $('vlv-std').textContent = isSW ? 'API 602 / B16.34' : 'ASME B16.10 / API 609';
+  var src = isSW ? VALVES_SW : VALVES_FLG;
+  var classes = Object.keys(src);
+  if (classes.indexOf(vlvCls) === -1) vlvCls = classes[0];
+
+  $('vlv-classes').innerHTML = classes.map(function(c) {
+    return '<button type="button" class="pill ' + (c === vlvCls ? 'active' : '') + '" data-c="' + c + '">' + c + '#</button>';
+  }).join('');
+  $('vlv-classes').querySelectorAll('.pill').forEach(function(b) {
+    b.onclick = function() { vlvCls = b.dataset.c; renderValves(); };
+  });
+
+  var dataset = src[vlvCls];
+  var map = {};
+  dataset.forEach(function(r) { map[normKey(r[0])] = r; });
+  if (!map[vlvNps]) vlvNps = normKey(dataset[0][0]);
+
+  $('vlv-nps-grid').innerHTML = NPS_LIST.map(function(x) {
+    var k = normKey(x.nps);
+    return '<button type="button" class="nps-btn ' + (k === vlvNps ? 'active' : '') + '" ' + (map[k] ? '' : 'disabled') + ' data-n="' + k + '">' + withIn(k) + '</button>';
+  }).join('');
+  $('vlv-nps-grid').querySelectorAll('.nps-btn:not(:disabled)').forEach(function(b) {
+    b.onclick = function() { vlvNps = b.dataset.n; renderValves(); };
+  });
+
+  var r = map[vlvNps];
+  var rtjAdd = (vlvEnd === 'RTJ') ? (parseInt(vlvCls, 10) >= 600 ? 0.625 : 0.5) : 0;
+
+  var cards = [];
+  if (isSW) {
+    var sock = r[1];
+    var swTypes = [['Gate (API 602)', r[2]], ['Globe (T-Pattern)', r[3]], ['Ball (3-Piece)', r[4]], ['Lift / Piston Check', r[5]], ['Swing Check', r[6]], ['Y-Pattern Globe', r[7]]];
+    cards = swTypes.map(function(tp) {
+      var net = tp[1] - 2 * sock;
+      return { name: tp[0], dim: tp[1], sub: 'Net Takeoff: ' + fmtFIF(net) + ' (Sock ' + fmtFIF(sock) + ')', sendVal: net };
+    });
+  } else {
+    var flgTypes = [['Gate Valve', r[1]], ['Globe Valve', r[2]], ['Ball Valve', r[3]], ['Swing Check', r[4]], ['Plug Valve', r[5]], ['Butterfly (Wafer)', r[6]]];
+    cards = flgTypes.map(function(tp) {
+      if (tp[1] == null) return { name: tp[0], dim: null };
+      var adj = tp[1] + (tp[0].indexOf('Butterfly') > -1 ? 0 : rtjAdd);
+      return { name: tp[0], dim: adj, sub: fmtFIF(adj) + (rtjAdd ? ' (incl. RTJ)' : ''), sendVal: adj };
+    });
+  }
+
+  $('vlv-metrics').innerHTML = cards.map(function(c, idx) {
+    if (c.dim == null) return '<div class="mbox"><div><div class="mlbl">' + c.name + '</div><div class="mval">—</div><div class="msub">N/A in ' + vlvCls + '#</div></div></div>';
+    return '<div class="mbox"><div><div class="mlbl">' + c.name + '</div><div class="mval">' + fmtFIF(c.dim) + '</div><div class="msub">' + c.sub + '</div></div><button type="button" class="btn-act" data-idx="' + idx + '">&#8594; Send to Takeoff</button></div>';
+  }).join('');
+
+  $('vlv-metrics').querySelectorAll('.btn-act').forEach(function(btn) {
+    btn.onclick = function() {
+      var c = cards[parseInt(btn.getAttribute('data-idx'), 10)];
+      openTab('takeoffs');
+      if (isSW) {
+        tkSys = vlvCls === '2500' ? 'sw6' : 'sw3';
+        renderTakeoffSystem();
+        $('cut-nps').value = vlvNps;
+        $('cut-valve').value = fmtFIF(c.sendVal);
+        extraValveWelds = 2;
+        valveBreakdown = 'SW ' + vlvCls + '# ' + c.name + ' Net Takeoff (' + fmtFIF(c.sendVal) + ') + 2 extra socket gaps';
+        $('valve-note').textContent = valveBreakdown;
+      } else if (vlvEnd === 'BW') {
+        tkSys = 'bw';
+        renderTakeoffSystem();
+        $('cut-nps').value = vlvNps;
+        $('cut-valve').value = fmtFIF(c.sendVal);
+        extraValveWelds = 2;
+        valveBreakdown = 'BW ' + vlvCls + '# ' + c.name + ' E-E (' + fmtFIF(c.sendVal) + ') + 2 extra butt welds';
+        $('valve-note').textContent = valveBreakdown;
+      } else {
+        tkSys = 'bw';
+        renderTakeoffSystem();
+        $('cut-nps').value = vlvNps;
+        var flgRow = (FLANGES_RAW[vlvCls] || FLANGES_RAW['150']).find(function(f) { return normKey(f[0]) === vlvNps; });
+        var wnY = flgRow ? (flgRow[11] || 0) : 0;
+        var totalAssy = c.sendVal + (2 * wnY) + 0.25;
+        $('cut-valve').value = fmtFIF(totalAssy);
+        extraValveWelds = 2;
+        valveBreakdown = vlvCls + '# ' + c.name + ' (' + fmtFIF(c.sendVal) + ') + 2× WN Flanges (' + fmtFIF(2 * wnY) + ') + 2× Gaskets (1/4' + INCH + ') + 2 extra flange welds';
+        $('valve-note').textContent = valveBreakdown;
+      }
+      calcTakeoff();
+    };
+  });
+
+  if (isSW) {
+    $('vlv-table').innerHTML = '<thead><tr><th>NPS</th><th>Sock J</th><th>Gate</th><th>Globe</th><th>Ball</th><th>Piston Chk</th><th>Swing Chk</th><th>Y-Globe</th></tr></thead><tbody>' +
+      dataset.map(function(x) {
+        return '<tr class="' + (normKey(x[0]) === vlvNps ? 'hl' : '') + '"><td>' + withIn(x[0]) + '</td><td>' + fmtFIF(x[1]) + '</td><td>' + fmtFIF(x[2]) + '</td><td>' + fmtFIF(x[3]) + '</td><td>' + fmtFIF(x[4]) + '</td><td>' + fmtFIF(x[5]) + '</td><td>' + fmtFIF(x[6]) + '</td><td>' + fmtFIF(x[7]) + '</td></tr>';
+      }).join('') + '</tbody>';
+  } else {
+    $('vlv-table').innerHTML = '<thead><tr><th>NPS</th><th>Gate</th><th>Globe</th><th>Ball</th><th>Swing Chk</th><th>Plug</th><th>Butterfly</th></tr></thead><tbody>' +
+      dataset.map(function(x) {
+        return '<tr class="' + (normKey(x[0]) === vlvNps ? 'hl' : '') + '"><td>' + withIn(x[0]) + '</td><td>' + fmtFIF(x[1]) + '</td><td>' + (x[2] != null ? fmtFIF(x[2]) : '—') + '</td><td>' + fmtFIF(x[3]) + '</td><td>' + fmtFIF(x[4]) + '</td><td>' + (x[5] != null ? fmtFIF(x[5]) : '—') + '</td><td>' + (x[6] != null ? fmtFIF(x[6]) : '—') + '</td></tr>';
+      }).join('') + '</tbody>';
+  }
+}
+renderValves();
+</script>
+
+<script>
+(function() {
+  var buf = '', acc = null, op = null;
+  var fracs = ['1/16','1/8','3/16','1/4','5/16','3/8','7/16','1/2','9/16','5/8','11/16','3/4','13/16','7/8','15/16'];
+  $('frac-keys').innerHTML = fracs.map(function(f) {
+    return '<button type="button" class="kbtn" style="height:42px;font-size:13.5px;" data-f="' + f + '">' + f + '</button>';
+  }).join('');
+  $('frac-keys').querySelectorAll('.kbtn').forEach(function(b) {
+    b.onclick = function() {
+      buf += (buf && !buf.endsWith(FOOT) && !buf.endsWith(' ') ? '-' : '') + b.dataset.f + INCH;
+      updateDisp();
+    };
+  });
+
+  var keys = [
+    ['7','7'],['8','8'],['9','9'],['÷','/'],
+    ['4','4'],['5','5'],['6','6'],['×','*'],
+    ['1','1'],['2','2'],['3','3'],['−','-'],
+    ['0','0'],['Feet (' + FOOT + ')',FOOT],['Inch (' + INCH + ')',INCH],['+','+'],
+    ['C','C'],['⌫','BS'],['×1.414','R2'],['=','=']
+  ];
+  $('calc-keys').innerHTML = keys.map(function(k) {
+    var cls = 'kbtn';
+    if (['+','-','*','/','R2'].indexOf(k[1]) > -1) cls += ' op';
+    if (k[1] === '=') cls += ' eq';
+    return '<button type="button" class="' + cls + '" data-act="' + k[1] + '">' + k[0] + '</button>';
+  }).join('');
+
+  function curVal() { return buf ? parseDim(buf) : (acc || 0); }
+  function updateDisp(valOverride) {
+    var v = valOverride !== undefined ? valOverride : (buf ? parseDim(buf) : (acc || 0));
+    $('c-expr').textContent = (acc !== null && op ? fmtFIF(acc) + ' ' + op + ' ' : '') + buf;
+    $('c-main').textContent = fmtFIF(v);
+    $('c-alt').textContent = fmtFIF(v) + '  |  ' + (v / 12).toFixed(2) + ' ft';
+  }
+  function evalOp(x, y, o) { return o === '+' ? x + y : o === '-' ? x - y : o === '*' ? x * y : (y ? x / y : 0); }
+
+  function evalVoiceCalc(rawTxt) {
+    var s = normalizeSpokenDim(rawTxt)
+      .replace(/(plus|add)/g, ' + ')
+      .replace(/(minus|subtract|take away|less)/g, ' - ')
+      .replace(/(times|multiplied by|multiply by|x)/g, ' * ')
+      .replace(/(divided by|divide by)/g, ' / ')
+      .replace(/×/g, ' * ')
+      .replace(/÷/g, ' / ');
+    var tokens = s.split(/\s+(\+|\-|\*|\/)\s+/).map(function(t) { return t.trim(); }).filter(Boolean);
+    if (!tokens.length) return;
+    var val = parseDim(tokens[0]);
+    var exprDisp = fmtFIF(val);
+    for (var i = 1; i < tokens.length - 1; i += 2) {
+      var o = tokens[i];
+      var rhsStr = tokens[i + 1];
+      var rhsVal = (o === '*' || o === '/') ? (parseFloat(rhsStr) || 1) : parseDim(rhsStr);
+      val = evalOp(val, rhsVal, o);
+      exprDisp += ' ' + o + ' ' + ((o === '*' || o === '/') ? rhsVal : fmtFIF(rhsVal));
+    }
+    acc = val; buf = ''; op = null;
+    updateDisp(val);
+    $('c-expr').textContent = exprDisp;
+    $('calc-tape').innerHTML = '<div>' + exprDisp + ' = <strong>' + fmtFIF(val) + '</strong></div>' + $('calc-tape').innerHTML;
+  }
+
+  attachVoiceButton('calc-mic-btn', 'calc-voice-in', 'calc-mic-status', function(txt) {
+    $('calc-voice-in').value = txt;
+    evalVoiceCalc(txt);
+  });
+  $('calc-voice-go').onclick = function() {
+    var txt = $('calc-voice-in').value;
+    if (txt.trim()) evalVoiceCalc(txt);
+  };
+  $('calc-voice-in').onkeydown = function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); $('calc-voice-go').click(); }
+  };
+
+  $('calc-keys').querySelectorAll('.kbtn').forEach(function(b) {
+    b.onclick = function() {
+      var a = b.dataset.act;
+      if (a === 'C') { buf = ''; acc = null; op = null; updateDisp(0); return; }
+      if (a === 'BS') { buf = buf.slice(0, -1); updateDisp(); return; }
+      if (a === 'R2') {
+        var res = curVal() * Math.SQRT2;
+        acc = res; buf = ''; op = null; updateDisp(res);
+        $('calc-tape').innerHTML = '<div>45° Travel = ' + fmtFIF(res) + '</div>' + $('calc-tape').innerHTML;
+        return;
+      }
+      if (['+','-','*','/'].indexOf(a) > -1) {
+        if (buf) acc = acc !== null && op ? evalOp(acc, parseDim(buf), op) : parseDim(buf);
+        op = a; buf = ''; updateDisp(acc || 0); return;
+      }
+      if (a === '=') {
+        if (acc !== null && op && buf) {
+          var rhs = (op === '*' || op === '/') ? (parseFloat(buf) || 1) : parseDim(buf);
+          var eqRes = evalOp(acc, rhs, op);
+          $('calc-tape').innerHTML = '<div>' + fmtFIF(acc) + ' ' + op + ' ' + buf + ' = <strong>' + fmtFIF(eqRes) + '</strong></div>' + $('calc-tape').innerHTML;
+          acc = eqRes; buf = ''; op = null; updateDisp(eqRes);
+        }
+        return;
+      }
+      buf += a; updateDisp();
+    };
+  });
+
+  $('send-cc-btn').onclick = function() {
+    $('cut-cc').value = fmtFIF(curVal());
+    openTab('takeoffs');
+    calcTakeoff();
+  };
+
+  $('wr-nps').innerHTML = NPS_LIST.map(function(x) {
+    return '<option value="' + x.nps + '" ' + (x.nps === '4' ? 'selected' : '') + '>' + withIn(x.nps) + '</option>';
+  }).join('');
+  function calcWrap() {
+    var od = getOd($('wr-nps').value);
+    var circ = Math.PI * od;
+    $('wr-res').innerHTML =
+      '<div class="result-main">Circumference: ' + fmtFIF(circ) + '</div>' +
+      '<div class="result-sub">Pipe OD: ' + fmtFIF(od) + ' • Quarter Mark: ' + fmtFIF(circ / 4) + '</div>';
+  }
+  $('wr-nps').onchange = calcWrap;
+  calcWrap();
+
+  $('hb-nps').innerHTML = NPS_LIST.map(function(x) {
+    return '<option value="' + x.nps + '" ' + (x.nps === '4' ? 'selected' : '') + '>' + withIn(x.nps) + '</option>';
+  }).join('');
+
+  function calcBlank(nps, psi, S, corr) {
+    var od = getOd(nps);
+    var pVal = Math.max(0, parseFloat(psi) || 0);
+    var sVal = Math.max(1000, parseFloat(S) || 20000);
+    var cVal = Math.max(0, parseFloat(corr) || 0);
+    var req = od * Math.sqrt((3 * pVal) / (16 * sVal)) + cVal;
+    return { od: od, req: req, plate: Math.ceil(req * 8) / 8 };
+  }
+
+  function updateBlank() {
+    var nps = $('hb-nps').value;
+    var psi = $('hb-psi').value;
+    var S = $('hb-stress').value;
+    var corr = $('hb-corr').value;
+    var res = calcBlank(nps, psi, S, corr);
+
+    $('hb-res').innerHTML =
+      '<div class="result-main">Min Blank: ' + fmtFIF(res.req) + '</div>' +
+      '<div class="result-sub">Next 1/8' + INCH + ' Plate: <strong>' + fmtFIF(res.plate) + '</strong> • Bore Basis: ' + fmtFIF(res.od) + ' • Test: ' + (parseFloat(psi) || 0) + ' psig</div>';
+
+    var testPressures = [150, 275, 450, 740, 1110, 1480];
+    $('hb-table').innerHTML = '<thead><tr><th>Test Press</th><th>Calc Min t</th><th>Next 1/8' + INCH + ' Plate</th></tr></thead><tbody>' +
+      testPressures.map(function(tp) {
+        var r = calcBlank(nps, tp, S, corr);
+        var isCur = Math.abs(tp - (parseFloat(psi) || 0)) < 1;
+        return '<tr class="' + (isCur ? 'hl' : '') + '"><td>' + tp + ' psig</td><td>' + fmtFIF(r.req) + '</td><td><strong>' + fmtFIF(r.plate) + '</strong></td></tr>';
+      }).join('') + '</tbody>';
+  }
+
+  ['hb-nps','hb-psi','hb-stress','hb-corr'].forEach(function(id) {
+    $(id).oninput = updateBlank;
+    $(id).onchange = updateBlank;
+  });
+  updateBlank();
+})();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js').catch(function() {});
+  });
+}
+</script>
+</body>
+</html>
